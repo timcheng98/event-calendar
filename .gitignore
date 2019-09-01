@@ -1,3 +1,7 @@
+data/**
+src/config/*
+!src/config/default.json
+
 # OSX
 #
 .DS_Store
@@ -21,6 +25,8 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
+*.xcworkspace
+ios/Pods/
 
 # Android/IntelliJ
 #
@@ -56,4 +62,4 @@ buck-out/
 *.jsbundle
 
 # CocoaPods
-# /ios/Pods/
+/ios/Pods/
