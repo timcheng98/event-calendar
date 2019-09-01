@@ -1,9 +1,11 @@
 import React from 'react';
-import { Text, View ,TouchableOpacity} from 'react-native';
-import {createStackNavigator, createDrawerNavigator} from 'react-navigation';
+import { Dimensions} from 'react-native';
+import { createDrawerNavigator} from 'react-navigation-drawer';
 import {Home} from './containers/Home/Home';
 import CalendarMonth from './components/CalendarMonth';
+import {createStackNavigator} from 'react-navigation-stack'
 import EventForm from './containers/Event/EventForm';
+import DrawerContent from './containers/DrawerContent';
 
 export const HomeNavigator = createStackNavigator({
   Home,
@@ -27,8 +29,9 @@ export const DrawerNavigator = createDrawerNavigator({
   defaultNavigationOptions: {
     header: null
   },
+  drawerWidth: Dimensions.get('window').width * 0.6,
   drawerBackgroundColor: '#FFF',
-  contentComponent: null,
+  contentComponent: DrawerContent,
   contentOptions: {
     activeTintColor: '#707070',
     activeLabelStyle: {
