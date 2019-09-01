@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch } from 'react-native';
 import { Icon } from 'native-base';
 import moment from 'moment';
 import DatePicker from 'react-native-datepicker';
@@ -70,7 +70,7 @@ class EventForm extends React.Component {
           }}
         >
           <Icon
-            style={{ fontSize: 35, paddingRight: 20}}
+            style={{ fontSize: 30, paddingRight: 20}}
             type="MaterialIcons"
             name="add-box"
           />
@@ -86,7 +86,8 @@ class EventForm extends React.Component {
       remark: '',
       date: null,
       startTime: null,
-      endTime: null
+      endTime: null,
+      allDay: false
     };
   }
 
@@ -99,6 +100,16 @@ class EventForm extends React.Component {
     } else {
       AsynStorage.setItem('markedDates', JSON.stringify(markedDates));
     }
+  }
+
+  toggleSwitch = async (value) => {
+    await this.setState({allDay: value});
+    if (this.state.allDay) {
+      this.setState({startTime: '00:00', endTime: '23:59'});
+    } else {
+      this.setState({startTime: null, endTime: null});
+    }
+    console.log(this.state.allDay);
   }
 
   render() {
@@ -156,9 +167,6 @@ class EventForm extends React.Component {
               }}
             />
           </View>
-          <View style={{flex: 0.1, paddingTop: '5%'}}>
-            <Text style={{ fontSize: 15}}>All-Day</Text>
-          </View>
           <View style={{flex: 0.1, justifyContent: 'center'}}>
             <Text style={{ fontSize: 15}}>Date</Text>
             <DatePicker
@@ -189,7 +197,20 @@ class EventForm extends React.Component {
               }}
             />
           </View>
-          <View style={{flex: 0.1, justifyContent: 'center'}}>
+          <View style={{flex: 0.1, paddingTop: '5%', flexDirection: 'row'}}>
+            <View style={{flex: 0.85}}>
+              <Text style={{ fontSize: 15}}>All-Day</Text>
+            </View>
+            <View style={{flex: 0.15}}>
+              <Switch
+                onValueChange={async (value) => {
+                  this.toggleSwitch(value);
+                }}
+                value={this.state.allDay}
+              />
+            </View>
+          </View>
+          <View style={{flex: 0.1, justifyContent: 'center', display: this.state.allDay ? 'none' : 'flex'}}>
             <Text style={{ fontSize: 15}}>Start Time</Text>
             <DatePicker
               style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
@@ -218,7 +239,7 @@ class EventForm extends React.Component {
               }}
             />
           </View>
-          <View style={{flex: 0.1, justifyContent: 'center', width: '100%'}}>
+          <View style={{flex: 0.1, justifyContent: 'center', width: '100%', display: this.state.allDay ? 'none' : 'flex'}}>
             <Text>Due Time</Text>
             <DatePicker
               style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}

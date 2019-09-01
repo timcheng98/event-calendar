@@ -1,26 +1,25 @@
 module.exports = {
-  env: {
-    browser: true,
-    es6: true,
+  "env": {
+      "es6": true,
+      "node": true
   },
-  extends: [
-    'airbnb',
-  ],
-  globals: {
-    Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly',
+  "extends": "airbnb",
+  "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly",
+      "fetch": false
   },
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
-    },
-    ecmaVersion: 2018,
-    sourceType: 'module',
-  },
-  plugins: [
-    'react',
-  ],
   "parser": "babel-eslint",
+  "parserOptions": {
+      "ecmaFeatures": {
+          "jsx": true
+      },
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+  },
+  "plugins": [
+      "react"
+  ],
   "rules": {
     "camelcase": "off",
     "quotes": ["warn", "single", {"allowTemplateLiterals": true}],
@@ -30,7 +29,6 @@ module.exports = {
     "class-methods-use-this": "off",
     "no-console": "off",
     "prefer-const": "off",
-    "no-plusplus": "error",
     "react/jsx-filename-extension": "off",
     "react/jsx-max-props-per-line": ["warn", {"when": "multiline"}],
     "react/prefer-stateless-function": "off",
@@ -42,4 +40,4 @@ module.exports = {
     "no-useless-constructor": "off",
     "import/order": "off"
   }
-};
+}
