@@ -5,6 +5,8 @@ import {Home} from './containers/Home/Home';
 import CalendarMonth from './components/CalendarMonth';
 import {createStackNavigator} from 'react-navigation-stack'
 import EventForm from './containers/Event/EventForm';
+import EventDetail from './containers/Event/EventDetail';
+import EventEditForm from './containers/Event/EventEditForm';
 import DrawerContent from './containers/DrawerContent';
 
 export const HomeNavigator = createStackNavigator({
@@ -16,7 +18,12 @@ export const HomeNavigator = createStackNavigator({
 });
 
 export const EventNavigator = createStackNavigator({
-  EventForm
+  EventForm,
+  EventDetail,
+  EventEditForm
+},
+{
+  initialRouteName: 'EventForm'
 });
 
 export const DrawerNavigator = createDrawerNavigator({

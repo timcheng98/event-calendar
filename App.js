@@ -1,7 +1,7 @@
 
 import React from 'react';
 import {
-  SafeAreaView
+  SafeAreaView, View
 } from 'react-native';
 import { createAppContainer, createSwitchNavigator} from 'react-navigation';
 import { DrawerNavigator } from './src/Navigator';
@@ -15,9 +15,11 @@ const AppContainer = createAppContainer(createSwitchNavigator({
 
 export const App = () => {
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <AppContainer />
-    </SafeAreaView>
+    <View style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1}}>
+        <AppContainer />
+      </SafeAreaView>
+    </View>
   );
 }
 

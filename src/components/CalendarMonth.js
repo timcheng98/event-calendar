@@ -21,10 +21,18 @@ class CalendarMonth extends React.Component {
       markedDatesObj: {},
       loading: true
     };
+
+    this.props.navigation.addListener(
+      'willFocus',
+      async () => {
+        let markedDatesObj = JSON.parse(await AsynStorage.getItem('markedDatesObj'));
+        this.setState({markedDatesObj, loading: false});
+      }
+    );
   }
 
   async componentDidMount() {
-    let markedDatesObj = JSON.parse(await AsynStorage.getItem('markedDatesObj'))
+    let markedDatesObj = JSON.parse(await AsynStorage.getItem('markedDatesObj'));
     this.setState({markedDatesObj, loading: false});
   }
 

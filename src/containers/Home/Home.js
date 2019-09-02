@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, TouchableOpacity, FlatList, TouchableWithoutFeedback } from 'react-native';
 import { Icon, Tab, Tabs } from 'native-base';
 import { SafeAreaView } from 'react-navigation';
 import AsynStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import CalendarMonth from '../../components/CalendarMonth';
+// import EventDetail from '../Event/EventDetail';
+import EventDetailComponent from '../../components/EventDetailCompoent';
 
 export const Home = (props) => {
   const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState({});
+  const [isEventSelected, setIsEventSelected] = useState(false);
 
   useEffect(() => {
     if (props.navigation.state.params === undefined) {
@@ -20,32 +24,42 @@ export const Home = (props) => {
           dateString: moment().format('YYYY-MM-DD')
         }
       });
-    } 
-    getEvents();
-  }, [events]);
+    }
+    props.navigation.addListener(
+      'willFocus',
+      () => {
+        getEvents();
+        console.log('willFocus');
+      }
+    );
+  }, []);
 
   const getEvents = async () => {
     let markedDates = JSON.parse(await AsynStorage.getItem('markedDates'));
     setEvents(markedDates);
+    console.log('markedDates', markedDates);
   };
 
   const renderEvent = () => {
-    let upcomingEvents = [];
-    events.map((item) => {
-      let date = Object.keys(item);
-      let start = moment();
-      let end = moment(date, 'YYYY-MM-DD');
-      let diff = Math.ceil(moment.duration(end.diff(start)).asDays());
-      if (diff >= 0 && diff <= 7) {
-        upcomingEvents.push(item);
-      }
-      return upcomingEvents;
-    });
-    let sortedUpcomingEvents = upcomingEvents.sort((a, b) => {
-      let first = moment(Object.keys(a)[0]).unix();
-      let second = moment(Object.keys(b)[0]).unix();
-      return first - second;
-    });
+    if (events !== null) {
+    // const {navigation} = props;
+      let upcomingEvents = [];
+      events.map((item) => {
+        let date = Object.keys(item);
+        let start = moment();
+        let end = moment(date, 'YYYY-MM-DD');
+        let diff = Math.ceil(moment.duration(end.diff(start)).asDays());
+        if (diff >= 0 && diff <= 7) {
+          upcomingEvents.push(item);
+        }
+        return upcomingEvents;
+      });
+      let sortedUpcomingEvents = upcomingEvents.sort((a, b) => {
+        let first = moment(Object.keys(a)[0]).unix();
+        let second = moment(Object.keys(b)[0]).unix();
+        return first - second;
+      });
+    
     /* fake data
     console.log('Upcoming', upcomingEvents);
     upcomingEvents = [
@@ -64,63 +78,77 @@ export const Home = (props) => {
           let {
             title,
             startTime,
-            endTime
+            endTime,
+            remark,
+            id
           } = event;
           date = moment(date).format('MMMM DD, YYYY');
+          let eventObj = {
+            title, startTime, endTime, date, remark, id
+          };
           return (
-            <View
-              style={{
-                flex: 0.2,
-                paddingVertical: '2%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                width: '100%'
-              }}
+            <TouchableOpacity onPress={() => {
+              setIsEventSelected(true);
+              setSelectedEvent(eventObj);
+            }}
             >
-              <View style={{flex: 0.1}}>
-                <Icon
-                  style={{ fontSize: 25, color: '#4A4A4A', marginRight: 10 }}
-                  type="MaterialCommunityIcons"
-                  name="circle-medium"
-                />
+              <View
+                style={{
+                  flex: 0.2,
+                  paddingVertical: '2%',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  width: '100%'
+                }}
+              >
+                <View style={{flex: 0.1}}>
+                  <Icon
+                    style={{ fontSize: 25, color: '#4A4A4A', marginRight: 10 }}
+                    type="MaterialCommunityIcons"
+                    name="circle-medium"
+                  />
+                </View>
+                <View style={{flex: 0.55}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: '#2E2E2E',
+                      fontWeight: 'bold',
+                      paddingBottom: '2%'
+                    }}
+                  >
+                    {title}
+                  </Text>
+                  <Text style={{ fontSize: 12, color: '#BFBFBF'}}>
+                    {date}
+                  </Text>
+                </View>
+                <View style={{flex: 0.3 }}>
+                  <Text>
+                    {`${startTime} - ${endTime}`}
+                  </Text>
+                </View>
+                <View style={{flex: 0.15}}>
+                  <Icon
+                    style={{ fontSize: 35, color: '#2E2E2E', paddingLeft: 10 }}
+                    type="MaterialCommunityIcons"
+                    name="arrow-right-box"
+                  />
+                </View>
               </View>
-              <View style={{flex: 0.55}}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: '#2E2E2E',
-                    fontWeight: 'bold',
-                    paddingBottom: '2%'
-                  }}
-                >
-                  {title}
-                </Text>
-                <Text style={{ fontSize: 12, color: '#BFBFBF'}}>
-                  {date}
-                </Text>
-              </View>
-              <View style={{flex: 0.3 }}>
-                <Text>
-                  {`${startTime} - ${endTime}`}
-                </Text>
-              </View>
-              <View style={{flex: 0.15}}>
-                <Icon
-                  style={{ fontSize: 35, color: '#2E2E2E', paddingLeft: 10 }}
-                  type="MaterialCommunityIcons"
-                  name="arrow-right-box"
-                />
-              </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />
     );
+  }
   };
 
   return (
+    <View style={{flex: 1}}>
     <SafeAreaView style={{flex: 1}}>
+      <TouchableWithoutFeedback onPress={() => setIsEventSelected(false)}>
       <View style={{ flex: 0.6}}>
         <View style={{ flex: 1, width: '95%', alignSelf: 'center'}}>
           <Tabs
@@ -138,6 +166,7 @@ export const Home = (props) => {
               activeTabStyle={{ backgroundColor: '#FFF' }}
               activeTextStyle={{ fontSize: 12, color: '#000' }}
               heading="MONTH"
+              
             >
               <CalendarMonth {...props} />
             </Tab>
@@ -170,17 +199,22 @@ export const Home = (props) => {
           </Tabs>
         </View>
       </View>
+      </TouchableWithoutFeedback>
       <View style={{flex: 0.5, paddingHorizontal: '5%' }}>
-        <View style={{ flex: 1, alignItems: 'flex-start', width: '100%'}}>
-          <View style={{ flex: 0.15, width: '100%'}}>
-            <Text style={{ fontSize: 25, color: '#BFBFBF', fontWeight: '500' }}>Upcoming</Text>
-          </View>
-          <View style={{ flex: 0.5, width: '100%'}}>
-            {renderEvent()}
-          </View>
-        </View>
+        {isEventSelected
+          ? <EventDetailComponent {...props} eventData={selectedEvent}/> : (
+            <View style={{ flex: 1, alignItems: 'flex-start', width: '100%'}}>
+              <View style={{ flex: 0.15, width: '100%'}}>
+                <Text style={{ fontSize: 25, color: '#BFBFBF', fontWeight: '500' }}>Upcoming</Text>
+              </View>
+              <View style={{ flex: 0.5, width: '100%'}}>
+                {renderEvent()}
+              </View>
+            </View>
+          )}
       </View>
     </SafeAreaView>
+    </View>
   );
 };
 
@@ -206,7 +240,7 @@ Home.navigationOptions = ({navigation}) => {
     },
     headerStyle: {
       backgroundColor: '#FFFFFF',
-      marginTop: -40,
+      // marginTop: -40,
       borderBottomWidth: 0
     },
     headerLeft: (

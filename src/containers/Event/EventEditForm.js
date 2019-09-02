@@ -1,19 +1,19 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch } from 'react-native';
-import { Icon } from 'native-base';
+import { Button, Icon } from 'native-base';
 import moment from 'moment';
 import DatePicker from 'react-native-datepicker';
 import uuidv4 from 'uuid/v4';
 import AsynStorage from '@react-native-community/async-storage';
 
-class EventForm extends React.Component {
+class EventEditForm extends React.Component {
   static navigationOptions = ({navigation}) => ({
     headerTitleStyle: {
       fontWeight: 'bold'
     },
     headerStyle: {
       backgroundColor: '#FFFFFF',
-      // marginTop: -40,
+      marginTop: -40,
       borderBottomWidth: 0
     },
     headerLeft: (
@@ -29,57 +29,7 @@ class EventForm extends React.Component {
         </TouchableOpacity>
       </View>
     ),
-    headerRight: (
-      <View>
-        <TouchableOpacity
-          onPress={ async () => {
-            const {
-              title,
-              date,
-              startTime,
-              endTime,
-              remark
-            } = navigation.state.params;
-            let newEvent = {
-              [date]: {
-                id: uuidv4(),
-                title,
-                startTime,
-                endTime,
-                remark,
-                marked: true,
-                dotColor: 'black'
-              }
-            };
-            // console.log('submit params', navigation.state.params)
-            const markedDates = JSON.parse(await AsynStorage.getItem('markedDates'));
-            markedDates.push(newEvent);
-            AsynStorage.setItem('markedDates', JSON.stringify(markedDates));
-
-            let markedDatesObj = {};
-            markedDates.map((item) => {
-              markedDatesObj = Object.assign(markedDatesObj, item);
-              return markedDatesObj;
-            });
-
-            AsynStorage.setItem('markedDatesObj', JSON.stringify(markedDatesObj));
-
-            // console.log('params title', navigation.state.params.title);
-            // console.log('params date', navigation.state.params.date);
-            // console.log('params start', navigation.state.params.startTime);
-            // console.log('params end', navigation.state.params.endTime);
-            // console.log('params remark', navigation.state.params.remark);
-            navigation.navigate('Home', {newEvent});
-          }}
-        >
-          <Icon
-            style={{ fontSize: 30, paddingRight: 20}}
-            type="MaterialIcons"
-            name="add-box"
-          />
-        </TouchableOpacity>
-      </View>
-    )
+    headerRight: null
   });
 
   constructor(props) {
@@ -90,32 +40,49 @@ class EventForm extends React.Component {
       date: null,
       startTime: null,
       endTime: null,
-      allDay: false
+      allDay: false,
+      target: {},
+      markedDates: []
     };
-    this.props.navigation.addListener(
-      'willFocus',
-      () => {
-        this.setState({
-          title: '',
-          remark: '',
-          date: null,
-          startTime: null,
-          endTime: null,
-          allDay: false
-        });
-      }
-    );
   }
 
   async componentDidMount() {
     let markedDates = [];
+    let id = await AsynStorage.getItem('event_id');
     // AsynStorage.removeItem('markedDates');
     // AsynStorage.removeItem('markedDatesObj');
     if (await AsynStorage.getItem('markedDates')) {
       markedDates = await AsynStorage.getItem('markedDates');
+      markedDates = JSON.parse(markedDates);
+      this.setState({markedDates});
     } else {
       AsynStorage.setItem('markedDates', JSON.stringify(markedDates));
     }
+    id = JSON.parse(id);
+    this.state.markedDates.map((item) => {
+      let event = Object.values(item)[0];
+      let date = Object.keys(item)[0];
+      let {
+        title, startTime, endTime, remark
+      } = event;
+      let target = {
+        title, startTime, endTime, remark, date
+      };
+      if (event.id === id) {
+        this.setState({target});
+      }
+      return null;
+    });
+    const {
+      title,
+      startTime,
+      endTime,
+      remark,
+      date
+    } = this.state.target;
+    this.setState({
+      title, startTime, endTime, remark, date
+    });
   }
 
   toggleSwitch = async (value) => {
@@ -136,6 +103,13 @@ class EventForm extends React.Component {
     console.log('start', typeof this.state.startTime);
     console.log('end', this.state.endTime);
     // console.log('remark', this.state.remark);
+    const {
+      title,
+      startTime,
+      endTime,
+      remark,
+      date
+    } = this.state;
     return (
       <View style={{ flex: 1, paddingHorizontal: '5%'}}>
         <ScrollView
@@ -152,7 +126,7 @@ class EventForm extends React.Component {
                 fontSize: 30
               }}
             >
-              New Event
+              Edit Event
             </Text>
             <Text
               style={{
@@ -160,7 +134,7 @@ class EventForm extends React.Component {
                 fontSize: 15
               }}
             >
-              Create your personal schedule
+              Edit your personal schedule
             </Text>
           </View>
           <View
@@ -179,10 +153,10 @@ class EventForm extends React.Component {
             />
             <TextInput
               placeholder="Event Title"
-              value={this.state.title}
-              onChangeText={(title) => {
-                this.setState({title});
-                this.props.navigation.setParams({title});
+              value={title}
+              onChangeText={(value) => {
+                this.setState({title: value});
+                // this.props.navigation.setParams({title});
               }}
             />
           </View>
@@ -190,7 +164,7 @@ class EventForm extends React.Component {
             <Text style={{ fontSize: 15}}>Date</Text>
             <DatePicker
               style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
-              date={this.state.date}
+              date={date}
               mode="date"
               placeholder="select date"
               format="YYYY-MM-DD"
@@ -210,9 +184,9 @@ class EventForm extends React.Component {
                   alignItems: 'flex-start'
                 }
               }}
-              onDateChange={(date) => {
-                this.setState({date});
-                this.props.navigation.setParams({date});
+              onDateChange={(value) => {
+                this.setState({date: value});
+                // this.props.navigation.setParams({date})
               }}
             />
           </View>
@@ -233,7 +207,7 @@ class EventForm extends React.Component {
             <Text style={{ fontSize: 15}}>Start Time</Text>
             <DatePicker
               style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
-              date={this.state.startTime}
+              date={startTime}
               mode="time"
               placeholder="select date"
               format="HH:mm"
@@ -252,9 +226,9 @@ class EventForm extends React.Component {
                   alignItems: 'flex-start'
                 }
               }}
-              onDateChange={(startTime) => {
-                this.setState({startTime});
-                this.props.navigation.setParams({startTime})
+              onDateChange={(value) => {
+                this.setState({startTime: value});
+                // this.props.navigation.setParams({startTime})
               }}
             />
           </View>
@@ -262,7 +236,7 @@ class EventForm extends React.Component {
             <Text>Due Time</Text>
             <DatePicker
               style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
-              date={this.state.endTime}
+              date={endTime}
               mode="time"
               iconComponent={(
                 <Icon
@@ -299,8 +273,9 @@ class EventForm extends React.Component {
                   width: '150%'
                 }
               }}
-              onDateChange={(endTime) => {
-                this.setState({endTime}); this.props.navigation.setParams({endTime});
+              onDateChange={(value) => {
+                this.setState({endTime: value});
+                // this.props.navigation.setParams({endTime});
               }}
             />
           </View>
@@ -365,12 +340,62 @@ class EventForm extends React.Component {
               multiline
               placeholder="Remarks"
               style={{ width: '100%', borderColor: '#DCD6D6', borderBottomWidth: 1}}
-              onChangeText={(remark) => {
-                this.setState({remark});
-                this.props.navigation.setParams({remark})
+              onChangeText={(value) => {
+                this.setState({remark: value});
+                // this.props.navigation.setParams({remark})
               }}
-              value={this.state.remark}
+              value={remark}
             />
+          </View>
+          <View style={{ flex: 0.1, alignItems: 'center', justifyContent: 'center'}}>
+            <Button
+              rounded
+              bordered
+              style={{
+                borderColor: '#4A4A4A',
+                justifyContent: 'center',
+                alignSelf: 'center',
+                width: '67%'
+              }}
+              onPress={async () => {
+                let id = await AsynStorage.getItem('event_id');
+                id = JSON.parse(id);
+                let newMarkedDates = [];
+                this.state.markedDates.map((item) => {
+                  let event = Object.values(item)[0];
+
+                  if (event.id !== id) {
+                    newMarkedDates.push(item);
+                  } else {
+                    let markedDateObj = {
+                      [date]: {
+                        id,
+                        title,
+                        startTime,
+                        endTime,
+                        remark,
+                        marked: true,
+                        dotColor: 'black'
+                      }
+                    };
+                    newMarkedDates.push(markedDateObj);
+                  }
+                  return newMarkedDates;
+                });
+                AsynStorage.setItem('markedDates', JSON.stringify(newMarkedDates));
+                let markedDatesObj = {};
+                newMarkedDates.map((item) => {
+                  markedDatesObj = Object.assign(markedDatesObj, item);
+                  return markedDatesObj;
+                });
+
+                AsynStorage.setItem('markedDatesObj', JSON.stringify(markedDatesObj));
+
+                this.props.navigation.navigate('Home');
+              }}
+            >
+              <Text style={{fontSize: 15, color: '#4A4A4A', fontWeight: '500'}}>Confirm</Text>
+            </Button>
           </View>
         </ScrollView>
       </View>
@@ -378,4 +403,4 @@ class EventForm extends React.Component {
   }
 }
 
-export default EventForm;
+export default EventEditForm;
