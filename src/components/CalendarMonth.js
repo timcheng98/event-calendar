@@ -28,7 +28,6 @@ class CalendarMonth extends React.Component {
 
   async componentDidMount() {
     let markedDatesObj = await Main.getStorage('markedDatesObj');
-    console.log('weqweqwqw', markedDatesObj);
     this.setState({markedDatesObj, loading: false});
     this.props.navigation.setParams({visible: false});
   }
@@ -47,6 +46,7 @@ class CalendarMonth extends React.Component {
     if (selectedDay.length > 0 ) {
       return (
         <FlatList
+          showsVerticalScrollIndicator={true}
           data={selectedDay}
           style={{flex: 1}}
           keyExtractor={(item, index) => index.toString()}
@@ -83,8 +83,20 @@ class CalendarMonth extends React.Component {
           justifyContent: 'center'
         }}
       >
-        <Text style={{color: '#CCCCCC', fontSize: 18}}>No Event</Text>
-        <Text style={{color: '#CCCCCC', fontSize: 18}}>Click “+” button to create event</Text>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.setParams({visible: false})}
+        >
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Text style={{color: '#CCCCCC', fontSize: 18}}>No Event</Text>
+            <Text style={{color: '#CCCCCC', fontSize: 18}}>Click “+” button to create event</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -94,7 +106,6 @@ class CalendarMonth extends React.Component {
       markedDatesObj,
       loading
     } = this.state;
-    console.log('123',markedDatesObj);
 
     if (loading) {
       return (
@@ -106,7 +117,7 @@ class CalendarMonth extends React.Component {
 
     return (
       <View
-        style={{ flex: 0.7, width: '100%', alignItems: 'center'}}
+        style={{ flex: 1, width: '100%', height: '100%', alignItems: 'center'}}
       >
         <Calendar
           markedDates={markedDatesObj}
@@ -160,7 +171,7 @@ class CalendarMonth extends React.Component {
                       <Icon
                         type="MaterialIcons"
                         name="clear"
-                        style={{fontSize: 28, color: '#4A4A4A'}}
+                        style={{fontSize: 28, color: '#4A4A4A', width: '100%'}}
                       />
                     </TouchableOpacity>
                   </View>

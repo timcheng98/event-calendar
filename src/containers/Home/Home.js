@@ -36,6 +36,7 @@ export const Home = (props) => {
         getEvents();
         getMonthlyEvents();
         console.log('willFocus');
+        props.navigation.setParams({isEventSelected: false});
       }
     );
     props.navigation.setParams({visible: false});
@@ -96,11 +97,12 @@ export const Home = (props) => {
                 startTime,
                 endTime,
                 remark,
-                id
+                id,
+                allDay
               } = event;
               date = moment(date).format('MMMM DD, YYYY');
               let eventObj = {
-                title, startTime, endTime, date, remark, id
+                title, startTime, endTime, date, remark, id, allDay
               };
               return (
                 <TouchableOpacity onPress={() => {
@@ -144,7 +146,9 @@ export const Home = (props) => {
                     </View>
                     <View style={{flex: 0.3 }}>
                       <Text style={{color: '#4A4A4A', fontSize: 15}}>
-                        {`${startTime} - ${endTime}`}
+                        {allDay
+                          ? 'Whole Day'
+                          : `${startTime} - ${endTime}`}
                       </Text>
                     </View>
                     <View style={{flex: 0.15}}>
@@ -209,7 +213,6 @@ export const Home = (props) => {
   };
 
   if (loading) {
-    console.log(loading);
     return (
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
         <Spinner />
@@ -224,10 +227,9 @@ export const Home = (props) => {
           props.navigation.setParams({isEventSelected: false});
         }}
         >
-          <View style={{ flex: 0.6}}>
-            <View style={{ flex: 1, width: '95%', alignSelf: 'center'}}>
+          <View style={{ flex: 0.55, width: '100%', height: '100%'}}>
+            <View style={{ flex: 1, width: '100%', padding: '2%', alignSelf: 'center'}}>
               <Tabs
-                style={{}}
                 tabContainerStyle={{ elevation: 0 }}
                 tabBarUnderlineStyle={{ backgroundColor: '#000000', height: 2 }}
               >
@@ -289,7 +291,7 @@ export const Home = (props) => {
             </View>
           </View>
         </TouchableWithoutFeedback>
-        <View style={{flex: 0.4, paddingHorizontal: '5%', paddingVertical: 15 }}>
+        <View style={{flex: 0.45, paddingHorizontal: '5%', width: '100%', height: '100%', paddingVertical: 15 }}>
           {renderEventDetail()}
         </View>
       </SafeAreaView>
@@ -315,7 +317,7 @@ Home.navigationOptions = ({navigation}) => {
 
   return ({
     headerTitleStyle: {
-      fontWeight: 'bold',
+      fontWeight: 'bold'
     },
     headerStyle: {
       backgroundColor: '#FFFFFF',
@@ -330,7 +332,7 @@ Home.navigationOptions = ({navigation}) => {
           <Icon
             style={{ fontSize: 30, color: '#4A4A4A', marginRight: 10 }}
             type="MaterialIcons"
-            name="menu"
+            name="sort"
           />
         </TouchableOpacity>
         <View style={{ alignSelf: 'center'}}>

@@ -9,7 +9,7 @@ export default class EventDetail extends Component {
   }
 
   async componentDidMount() {
-    this.props.navigation.setParams({eventClose: false});
+    this.props.navigation.setParams({isEventSelected: true});
   }
 
   render() {
@@ -18,8 +18,10 @@ export default class EventDetail extends Component {
       startTime,
       endTime,
       remark,
-      date
+      date,
+      allDay
     } = this.props.eventData;
+    console.log('a', this.props.eventData);
     return (
       <View
         style={{
@@ -110,7 +112,9 @@ export default class EventDetail extends Component {
               </View>
               <View style={{flex: 0.3 }}>
                 <Text style={{fontSize: 12, color: '#2E2E2E'}}>
-                  {`${startTime} - ${endTime}`}
+                  {allDay
+                    ? 'Whole Day'
+                    : `${startTime} - ${endTime}`}
                 </Text>
               </View>
 

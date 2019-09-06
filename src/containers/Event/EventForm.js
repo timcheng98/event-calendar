@@ -39,7 +39,8 @@ class EventForm extends React.Component {
               date,
               startTime,
               endTime,
-              remark
+              remark,
+              allDay
             } = navigation.state.params;
             let newEvent = {
               [date]: {
@@ -51,6 +52,7 @@ class EventForm extends React.Component {
                 marked: true,
                 dotColor: 'black',
                 selected: true,
+                allDay,
                 selectedColor: '#008CBF'
               }
             };
@@ -126,9 +128,9 @@ class EventForm extends React.Component {
   toggleSwitch = async (value) => {
     await this.setState({allDay: value});
     if (this.state.allDay) {
-      this.setState({startTime: '00:00', endTime: '23:59'}); this.props.navigation.setParams({startTime: '00:00', endTime: '23:59'});
+      this.setState({startTime: '00:00', endTime: '23:59'}); this.props.navigation.setParams({startTime: '00:00', endTime: '23:59', allDay: true});
     } else {
-      this.setState({startTime: null, endTime: null});
+      this.setState({startTime: null, endTime: null, allDay: false});
       this.props.navigation.setParams({startTime: null, endTime: null});
     }
     console.log(this.state.allDay);
@@ -224,7 +226,7 @@ class EventForm extends React.Component {
           </View>
           <View style={{flex: 0.05, alignItems: 'center', flexDirection: 'row'}}>
             <View style={{flex: 0.85}}>
-              <Text style={{ fontSize: 15}}>All-Day</Text>
+              <Text style={{ fontSize: 15}}>Whole Day</Text>
             </View>
             <View style={{flex: 0.15}}>
               <Switch
@@ -235,7 +237,7 @@ class EventForm extends React.Component {
               />
             </View>
           </View>
-          <View style={{flex: 0.1, justifyContent: 'center', display: this.state.allDay ? 'flex' : 'flex'}}>
+          <View style={{flex: 0.1, justifyContent: 'center', display: this.state.allDay ? 'none' : 'flex'}}>
             <Text style={{ fontSize: 15}}>Start Time</Text>
             <DatePicker
               style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
@@ -264,7 +266,7 @@ class EventForm extends React.Component {
               }}
             />
           </View>
-          <View style={{flex: 0.1, justifyContent: 'center', width: '100%', display: this.state.allDay ? 'flex' : 'flex'}}>
+          <View style={{flex: 0.1, justifyContent: 'center', width: '100%', display: this.state.allDay ? 'none' : 'flex'}}>
             <Text>Due Time</Text>
             <DatePicker
               style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}

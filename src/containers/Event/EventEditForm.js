@@ -59,10 +59,10 @@ class EventEditForm extends React.Component {
       let event = Object.values(item)[0];
       let date = Object.keys(item)[0];
       let {
-        title, startTime, endTime, remark
+        title, startTime, endTime, remark, allDay
       } = event;
       let target = {
-        title, startTime, endTime, remark, date
+        title, startTime, endTime, remark, date, allDay
       };
       if (event.id === id) {
         this.setState({target});
@@ -74,10 +74,11 @@ class EventEditForm extends React.Component {
       startTime,
       endTime,
       remark,
-      date
+      date,
+      allDay
     } = this.state.target;
     this.setState({
-      title, startTime, endTime, remark, date
+      title, startTime, endTime, remark, date, allDay
     });
   }
 
@@ -100,7 +101,8 @@ class EventEditForm extends React.Component {
       startTime,
       endTime,
       remark,
-      date
+      date,
+      allDay
     } = this.state;
     return (
       <View style={{ flex: 1, paddingHorizontal: '5%'}}>
@@ -184,7 +186,7 @@ class EventEditForm extends React.Component {
           </View>
           <View style={{flex: 0.1, paddingTop: '5%', flexDirection: 'row'}}>
             <View style={{flex: 0.85}}>
-              <Text style={{ fontSize: 15}}>All-Day</Text>
+              <Text style={{ fontSize: 15}}>Whole Day</Text>
             </View>
             <View style={{flex: 0.15}}>
               <Switch
@@ -195,7 +197,7 @@ class EventEditForm extends React.Component {
               />
             </View>
           </View>
-          <View style={{flex: 0.1, justifyContent: 'center', display: this.state.allDay ? 'flex' : 'flex'}}>
+          <View style={{flex: 0.1, justifyContent: 'center', display: this.state.allDay ? 'none' : 'flex'}}>
             <Text style={{ fontSize: 15}}>Start Time</Text>
             <DatePicker
               style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
@@ -224,7 +226,7 @@ class EventEditForm extends React.Component {
               }}
             />
           </View>
-          <View style={{flex: 0.1, justifyContent: 'center', width: '100%', display: this.state.allDay ? 'flex' : 'flex'}}>
+          <View style={{flex: 0.1, justifyContent: 'center', width: '100%', display: this.state.allDay ? 'none' : 'flex'}}>
             <Text>Due Time</Text>
             <DatePicker
               style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
@@ -365,6 +367,7 @@ class EventEditForm extends React.Component {
                         startTime,
                         endTime,
                         remark,
+                        allDay,
                         marked: true,
                         dotColor: 'black'
                       }
