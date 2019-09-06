@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, TouchableOpacity, FlatList, TouchableWithoutFeedback } from 'react-native';
-import { Icon, Tab, Tabs } from 'native-base';
+import { 
+  Text, View, TouchableOpacity, FlatList, TouchableWithoutFeedback
+} from 'react-native';
+import { 
+  Card, Icon, Tab, Tabs, TabHeading, Spinner
+} from 'native-base';
 import { SafeAreaView } from 'react-navigation';
-import AsynStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import CalendarMonth from '../../components/CalendarMonth';
-// import EventDetail from '../Event/EventDetail';
+import * as Main from '../../core/Main';
 import EventDetailComponent from '../../components/EventDetailCompoent';
 
 export const Home = (props) => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState({});
-  const [isEventSelected, setIsEventSelected] = useState(false);
+  const [countMonth, setCountMonth] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (props.navigation.state.params === undefined) {
@@ -24,32 +28,51 @@ export const Home = (props) => {
           dateString: moment().format('YYYY-MM-DD')
         }
       });
+      props.navigation.setParams({isEventSelected: false});
     }
     props.navigation.addListener(
       'willFocus',
       () => {
         getEvents();
+        getMonthlyEvents();
         console.log('willFocus');
       }
     );
+    props.navigation.setParams({visible: false});
+    setLoading(false);
   }, []);
 
   const getEvents = async () => {
-    let markedDates = JSON.parse(await AsynStorage.getItem('markedDates'));
+    let markedDates = await Main.getStorage('markedDates');
     setEvents(markedDates);
     console.log('markedDates', markedDates);
   };
 
+  const getMonthlyEvents = async () => {
+    let markedDates = await Main.getStorage('markedDates');
+    let count = 0;
+    markedDates.map((item) => {
+      let date = Object.keys(item)[0];
+      let date_year = moment(date).year();
+      let date_month = moment(date).month();
+      if (date_year === moment().year()) {
+        if (date_month === moment().month()) {
+          count++;
+          setCountMonth(count);
+        }
+      }
+    });
+  };
+
   const renderEvent = () => {
     if (events !== null) {
-    // const {navigation} = props;
       let upcomingEvents = [];
       events.map((item) => {
-        let date = Object.keys(item);
+        let date = Object.keys(item)[0];
         let start = moment();
         let end = moment(date, 'YYYY-MM-DD');
-        let diff = Math.ceil(moment.duration(end.diff(start)).asDays());
-        if (diff >= 0 && diff <= 7) {
+        let diff = moment.duration(end.diff(start)).asDays();
+        if (diff > -1 && diff <= 7) {
           upcomingEvents.push(item);
         }
         return upcomingEvents;
@@ -59,161 +82,217 @@ export const Home = (props) => {
         let second = moment(Object.keys(b)[0]).unix();
         return first - second;
       });
-    
-    /* fake data
-    console.log('Upcoming', upcomingEvents);
-    upcomingEvents = [
-      {'2019-09-06': {
-        title: '123', startTime: '00:00', endTime: '00:01', marked: true, dotColor: 'black'}
-      }
-    ];
-    */
-    return (
-      <FlatList
-        keyExtractor={(item, index) => index.toString()}
-        data={sortedUpcomingEvents}
-        renderItem={(item) => {
-          let event = Object.values(item.item)[0];
-          let date = Object.keys(item.item)[0];
-          let {
-            title,
-            startTime,
-            endTime,
-            remark,
-            id
-          } = event;
-          date = moment(date).format('MMMM DD, YYYY');
-          let eventObj = {
-            title, startTime, endTime, date, remark, id
-          };
-          return (
-            <TouchableOpacity onPress={() => {
-              setIsEventSelected(true);
-              setSelectedEvent(eventObj);
-            }}
-            >
-              <View
-                style={{
-                  flex: 0.2,
-                  paddingVertical: '2%',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  width: '100%'
+      if (sortedUpcomingEvents.length > 0) {
+        return (
+          <FlatList
+            style={{flex: 1}}
+            keyExtractor={(item, index) => index.toString()}
+            data={sortedUpcomingEvents}
+            renderItem={(item) => {
+              let event = Object.values(item.item)[0];
+              let date = Object.keys(item.item)[0];
+              let {
+                title,
+                startTime,
+                endTime,
+                remark,
+                id
+              } = event;
+              date = moment(date).format('MMMM DD, YYYY');
+              let eventObj = {
+                title, startTime, endTime, date, remark, id
+              };
+              return (
+                <TouchableOpacity onPress={() => {
+                  props.navigation.setParams({isEventSelected: true});
+                  setSelectedEvent(eventObj);
                 }}
-              >
-                <View style={{flex: 0.1}}>
-                  <Icon
-                    style={{ fontSize: 25, color: '#4A4A4A', marginRight: 10 }}
-                    type="MaterialCommunityIcons"
-                    name="circle-medium"
-                  />
-                </View>
-                <View style={{flex: 0.55}}>
-                  <Text
+                >
+                  <View
                     style={{
-                      fontSize: 15,
-                      color: '#2E2E2E',
-                      fontWeight: 'bold',
-                      paddingBottom: '2%'
+                      flex: 0.2,
+                      paddingVertical: '3%',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      width: '100%',
+                      borderBottomWidth: 1 / 3,
+                      borderColor: '#CCCCCC'
                     }}
                   >
-                    {title}
-                  </Text>
-                  <Text style={{ fontSize: 12, color: '#BFBFBF'}}>
-                    {date}
-                  </Text>
-                </View>
-                <View style={{flex: 0.3 }}>
-                  <Text>
-                    {`${startTime} - ${endTime}`}
-                  </Text>
-                </View>
-                <View style={{flex: 0.15}}>
-                  <Icon
-                    style={{ fontSize: 35, color: '#2E2E2E', paddingLeft: 10 }}
-                    type="MaterialCommunityIcons"
-                    name="arrow-right-box"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-          );
-        }}
-      />
+                    <View style={{flex: 0.1}}>
+                      <Icon
+                        style={{ fontSize: 25, color: '#4A4A4A', marginRight: 10 }}
+                        type="MaterialCommunityIcons"
+                        name="circle-medium"
+                      />
+                    </View>
+                    <View style={{flex: 0.55}}>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          color: '#2E2E2E',
+                          fontWeight: 'bold',
+                          paddingBottom: '2%'
+                        }}
+                      >
+                        {title}
+                      </Text>
+                      <Text style={{ fontSize: 12, color: '#6A6A6A'}}>
+                        {date}
+                      </Text>
+                    </View>
+                    <View style={{flex: 0.3 }}>
+                      <Text style={{color: '#4A4A4A', fontSize: 15}}>
+                        {`${startTime} - ${endTime}`}
+                      </Text>
+                    </View>
+                    <View style={{flex: 0.15}}>
+                      <Icon
+                        style={{ fontSize: 35, color: '#2E2E2E', paddingLeft: 10 }}
+                        type="MaterialCommunityIcons"
+                        name="arrow-right-box"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        );
+      }
+      return (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <View style={{paddingVertical: '2%'}}>
+            <Text style={{color: '#8D8D8D', fontSize: 15}}>No Upcoming Event</Text>
+          </View>
+          <View>
+            <Text style={{color: '#CCCCCC', fontSize: 15}}>Click “+” button to create event</Text>
+          </View>
+        </View>
+      );
+    }
+  };
+
+  const renderEventDetail = () => {
+    if (props.navigation.getParam('isEventSelected')) {
+      return (<EventDetailComponent {...props} eventData={selectedEvent} />
+      );
+    }
+    return (
+      <View style={{ flex: 1, alignItems: 'flex-start', width: '100%'}}>
+        <View style={{ flex: 0.15, width: '100%'}}>
+          <Text style={{ fontSize: 18, color: '#BFBFBF', fontWeight: '500' }}>Upcoming Events</Text>
+        </View>
+        <Card
+          style={{
+            flex: 1,
+            width: '100%',
+            shadowColor: '#4A4A4A',
+            shadowOffset: {
+              width: 0,
+              height: 2
+            },
+            shadowOpacity: 0.3,
+            shadowRadius: 3.84,
+            borderRadius: 5,
+            elevation: 5,
+            paddingHorizontal: '5%'
+          }}
+        >
+          <View style={{ flex: 1, width: '100%'}}>
+            {renderEvent()}
+          </View>
+        </Card>
+      </View>
+    );
+  };
+
+  if (loading) {
+    console.log(loading);
+    return (
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <Spinner />
+      </View>
     );
   }
-  };
 
   return (
     <View style={{flex: 1}}>
-    <SafeAreaView style={{flex: 1}}>
-      <TouchableWithoutFeedback onPress={() => setIsEventSelected(false)}>
-      <View style={{ flex: 0.6}}>
-        <View style={{ flex: 1, width: '95%', alignSelf: 'center'}}>
-          <Tabs
-            style={{}}
-            tabContainerStyle={{ elevation: 0 }}
-            tabBarUnderlineStyle={{ backgroundColor: '#000', height: 2 }}
-          >
-            <Tab
-              textStyle={{ fontSize: 12, color: '#4A4A4A' }}
-              tabStyle={{
-                backgroundColor: '#FFF',
-                borderBottomWidth: 0.333,
-                borderColor: '#c9c9c9'
-              }}
-              activeTabStyle={{ backgroundColor: '#FFF' }}
-              activeTextStyle={{ fontSize: 12, color: '#000' }}
-              heading="MONTH"
-              
-            >
-              <CalendarMonth {...props} />
-            </Tab>
-            <Tab
-              textStyle={{ fontSize: 12, color: '#4A4A4A' }}
-              tabStyle={{
-                backgroundColor: '#FFF',
-                borderBottomWidth: 0.333,
-                borderColor: '#c9c9c9'
-              }}
-              activeTabStyle={{ backgroundColor: '#FFF' }}
-              activeTextStyle={{ fontSize: 12, color: '#000' }}
-              heading="WEEK"
-            >
-              {/* <Records navigation={this.props.navigation} /> */}
-            </Tab>
-            <Tab
-              textStyle={{ fontSize: 12, color: '#4A4A4A' }}
-              tabStyle={{
-                backgroundColor: '#FFF',
-                borderBottomWidth: 0.333,
-                borderColor: '#c9c9c9'
-              }}
-              activeTabStyle={{ backgroundColor: '#FFF' }}
-              activeTextStyle={{ fontSize: 12, color: '#000' }}
-              heading="DAY"
-            >
-              {/* <Applications navigation={this.props.navigation} /> */}
-            </Tab>
-          </Tabs>
-        </View>
-      </View>
-      </TouchableWithoutFeedback>
-      <View style={{flex: 0.5, paddingHorizontal: '5%' }}>
-        {isEventSelected
-          ? <EventDetailComponent {...props} eventData={selectedEvent}/> : (
-            <View style={{ flex: 1, alignItems: 'flex-start', width: '100%'}}>
-              <View style={{ flex: 0.15, width: '100%'}}>
-                <Text style={{ fontSize: 25, color: '#BFBFBF', fontWeight: '500' }}>Upcoming</Text>
-              </View>
-              <View style={{ flex: 0.5, width: '100%'}}>
-                {renderEvent()}
-              </View>
+      <SafeAreaView style={{flex: 1}}>
+        <TouchableWithoutFeedback onPress={() => {
+          props.navigation.setParams({isEventSelected: false});
+        }}
+        >
+          <View style={{ flex: 0.6}}>
+            <View style={{ flex: 1, width: '95%', alignSelf: 'center'}}>
+              <Tabs
+                style={{}}
+                tabContainerStyle={{ elevation: 0 }}
+                tabBarUnderlineStyle={{ backgroundColor: '#000000', height: 2 }}
+              >
+                <Tab
+                  textStyle={{ fontSize: 12, color: '#4A4A4A' }}
+                  tabStyle={{
+                    backgroundColor: '#FFFFFF',
+                    borderBottomWidth: 0.333,
+                    borderColor: '#cccccc'
+                  }}
+                  activeTabStyle={{ backgroundColor: '#FFFFFF' }}
+                  activeTextStyle={{ fontSize: 12, color: '#4A4A4A' }}
+                  heading={(
+                    <TabHeading style={{backgroundColor: '#FFFFFF'}}>
+                      <Text>Month</Text>
+                      <Card style={{borderRadius:  25 / 2, height: 25, width: 25, backgroundColor: '#fd5c5c',flex: 0.35, alignItems:'center', justifyContent: 'center'}}>
+                        <Text style={{color: '#FFFFFF', fontSize: 12, alignSelf: 'center', fontWeight: '500'}}>{countMonth}</Text>
+                      </Card>
+                    </TabHeading>
+                    )}
+                >
+                  <CalendarMonth {...props} markedDates={events} />
+                </Tab>
+                <Tab
+                  textStyle={{ fontSize: 12, color: '#4A4A4A' }}
+                  tabStyle={{
+                    backgroundColor: '#FFFFFF',
+                    borderBottomWidth: 0.333,
+                    borderColor: '#cccccc'
+                  }}
+                  activeTabStyle={{ backgroundColor: '#FFFFFF' }}
+                  activeTextStyle={{ fontSize: 12, color: '#4A4A4A' }}
+                  heading={(
+                    <TabHeading style={{backgroundColor: '#FFFFFF'}}>
+                      <Text>Week</Text>
+                    </TabHeading>
+                    )}
+                >
+                  {/* <Records navigation={this.props.navigation} /> */}
+                </Tab>
+                <Tab
+                  textStyle={{ fontSize: 12, color: '#4A4A4A' }}
+                  tabStyle={{
+                    backgroundColor: '#FFFFFF',
+                    borderBottomWidth: 0.333,
+                    borderColor: '#cccccc'
+                  }}
+                  activeTabStyle={{ backgroundColor: '#FFFFFF' }}
+                  activeTextStyle={{ fontSize: 12, color: '#4A4A4A' }}
+                  heading={(
+                    <TabHeading style={{backgroundColor: '#FFFFFF'}}>
+                      <Text>Day</Text>
+                    </TabHeading>
+                    )}
+                >
+                  {/* <Applications navigation={this.props.navigation} /> */}
+                </Tab>
+              </Tabs>
             </View>
-          )}
-      </View>
-    </SafeAreaView>
+          </View>
+        </TouchableWithoutFeedback>
+        <View style={{flex: 0.4, paddingHorizontal: '5%', paddingVertical: 15 }}>
+          {renderEventDetail()}
+        </View>
+      </SafeAreaView>
     </View>
   );
 };
@@ -236,13 +315,13 @@ Home.navigationOptions = ({navigation}) => {
 
   return ({
     headerTitleStyle: {
-      fontWeight: 'bold'
+      fontWeight: 'bold',
     },
     headerStyle: {
       backgroundColor: '#FFFFFF',
-      // marginTop: -40,
       borderBottomWidth: 0
     },
+    headerForceInset: { top: 'never', bottom: 'never' },
     headerLeft: (
       <View style={{marginLeft: 20, flex: 1, flexDirection: 'row'}}>
         <TouchableOpacity
@@ -255,10 +334,11 @@ Home.navigationOptions = ({navigation}) => {
           />
         </TouchableOpacity>
         <View style={{ alignSelf: 'center'}}>
-          <Text style={{ fontSize: 20, fontWeight: '400'}}>
-            {month}
+          <Text style={{ fontSize: 15, fontWeight: '400'}}>
+            {/* {month}
             &nbsp;
-            {year}
+            {year} */}
+            {moment().format('MMM DD, YYYY')}
           </Text>
         </View>
       </View>

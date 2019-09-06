@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch } from 'react-native';
 import { Button, Icon } from 'native-base';
-import moment from 'moment';
 import DatePicker from 'react-native-datepicker';
-import uuidv4 from 'uuid/v4';
-import AsynStorage from '@react-native-community/async-storage';
+import * as Main from '../../core/Main';
 
 class EventEditForm extends React.Component {
   static navigationOptions = ({navigation}) => ({
@@ -13,9 +11,9 @@ class EventEditForm extends React.Component {
     },
     headerStyle: {
       backgroundColor: '#FFFFFF',
-      marginTop: -40,
       borderBottomWidth: 0
     },
+    headerForceInset: { top: 'never', bottom: 'never' },
     headerLeft: (
       <View>
         <TouchableOpacity
@@ -48,17 +46,15 @@ class EventEditForm extends React.Component {
 
   async componentDidMount() {
     let markedDates = [];
-    let id = await AsynStorage.getItem('event_id');
+    let id = await Main.getStorage('event_id');
     // AsynStorage.removeItem('markedDates');
     // AsynStorage.removeItem('markedDatesObj');
-    if (await AsynStorage.getItem('markedDates')) {
-      markedDates = await AsynStorage.getItem('markedDates');
-      markedDates = JSON.parse(markedDates);
+    if (await Main.getStorage('markedDates')) {
+      markedDates = await Main.getStorage('markedDates');
       this.setState({markedDates});
     } else {
-      AsynStorage.setItem('markedDates', JSON.stringify(markedDates));
+      await Main.setStorage('markedDates', markedDates);
     }
-    id = JSON.parse(id);
     this.state.markedDates.map((item) => {
       let event = Object.values(item)[0];
       let date = Object.keys(item)[0];
@@ -93,16 +89,12 @@ class EventEditForm extends React.Component {
       this.setState({startTime: null, endTime: null});
       this.props.navigation.setParams({startTime: null, endTime: null});
     }
-    console.log(this.state.allDay);
-    console.log(typeof this.state.startTime);
-    console.log(this.state.endTime);
+    // console.log(this.state.allDay);
+    // console.log(typeof this.state.startTime);
+    // console.log(this.state.endTime);
   }
 
   render() {
-    // console.log('title', this.state.title);
-    console.log('start', typeof this.state.startTime);
-    console.log('end', this.state.endTime);
-    // console.log('remark', this.state.remark);
     const {
       title,
       startTime,
@@ -358,8 +350,7 @@ class EventEditForm extends React.Component {
                 width: '67%'
               }}
               onPress={async () => {
-                let id = await AsynStorage.getItem('event_id');
-                id = JSON.parse(id);
+                let id = await Main.getStorage('event_id');
                 let newMarkedDates = [];
                 this.state.markedDates.map((item) => {
                   let event = Object.values(item)[0];
@@ -382,16 +373,16 @@ class EventEditForm extends React.Component {
                   }
                   return newMarkedDates;
                 });
-                AsynStorage.setItem('markedDates', JSON.stringify(newMarkedDates));
+                await Main.setStorage('markedDates', newMarkedDates);
                 let markedDatesObj = {};
                 newMarkedDates.map((item) => {
                   markedDatesObj = Object.assign(markedDatesObj, item);
                   return markedDatesObj;
                 });
 
-                AsynStorage.setItem('markedDatesObj', JSON.stringify(markedDatesObj));
+                await Main.setStorage('markedDatesObj', markedDatesObj);
 
-                this.props.navigation.navigate('Home');
+                this.props.navigation.goBack();
               }}
             >
               <Text style={{fontSize: 15, color: '#4A4A4A', fontWeight: '500'}}>Confirm</Text>

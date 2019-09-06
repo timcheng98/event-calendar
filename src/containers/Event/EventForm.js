@@ -4,7 +4,7 @@ import { Icon } from 'native-base';
 import moment from 'moment';
 import DatePicker from 'react-native-datepicker';
 import uuidv4 from 'uuid/v4';
-import AsynStorage from '@react-native-community/async-storage';
+import * as Main from '../../core/Main';
 
 class EventForm extends React.Component {
   static navigationOptions = ({navigation}) => ({
@@ -16,6 +16,7 @@ class EventForm extends React.Component {
       // marginTop: -40,
       borderBottomWidth: 0
     },
+    headerForceInset: { top: 'never', bottom: 'never' },
     headerLeft: (
       <View>
         <TouchableOpacity
@@ -48,13 +49,15 @@ class EventForm extends React.Component {
                 endTime,
                 remark,
                 marked: true,
-                dotColor: 'black'
+                dotColor: 'black',
+                selected: true,
+                selectedColor: '#008CBF'
               }
             };
             // console.log('submit params', navigation.state.params)
-            const markedDates = JSON.parse(await AsynStorage.getItem('markedDates'));
+            const markedDates = await Main.getStorage('markedDates');
             markedDates.push(newEvent);
-            AsynStorage.setItem('markedDates', JSON.stringify(markedDates));
+            await Main.setStorage('markedDates', markedDates);
 
             let markedDatesObj = {};
             markedDates.map((item) => {
@@ -62,7 +65,9 @@ class EventForm extends React.Component {
               return markedDatesObj;
             });
 
-            AsynStorage.setItem('markedDatesObj', JSON.stringify(markedDatesObj));
+            await Main.setStorage('markedDatesObj', markedDatesObj);
+
+            console.log('object', markedDatesObj);
 
             // console.log('params title', navigation.state.params.title);
             // console.log('params date', navigation.state.params.date);
@@ -109,12 +114,12 @@ class EventForm extends React.Component {
 
   async componentDidMount() {
     let markedDates = [];
-    // AsynStorage.removeItem('markedDates');
-    // AsynStorage.removeItem('markedDatesObj');
-    if (await AsynStorage.getItem('markedDates')) {
-      markedDates = await AsynStorage.getItem('markedDates');
+    // await Main.removeStorage('markedDates');
+    // await Main.removeStorage('markedDatesObj');
+    if (await Main.getStorage('markedDates')) {
+      markedDates = await Main.getStorage('markedDates');
     } else {
-      AsynStorage.setItem('markedDates', JSON.stringify(markedDates));
+      await Main.setStorage('markedDates', markedDates);
     }
   }
 
@@ -178,6 +183,7 @@ class EventForm extends React.Component {
               name="calendar-text"
             />
             <TextInput
+              style={{flex: 1, paddingVertical: '1%'}}
               placeholder="Event Title"
               value={this.state.title}
               onChangeText={(title) => {
@@ -189,10 +195,10 @@ class EventForm extends React.Component {
           <View style={{flex: 0.1, justifyContent: 'center'}}>
             <Text style={{ fontSize: 15}}>Date</Text>
             <DatePicker
-              style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
+              style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
               date={this.state.date}
               mode="date"
-              placeholder="select date"
+              placeholder="Pick a Date"
               format="YYYY-MM-DD"
               minDate={new Date()}
               confirmBtnText="Confirm"
@@ -216,7 +222,7 @@ class EventForm extends React.Component {
               }}
             />
           </View>
-          <View style={{flex: 0.1, paddingTop: '5%', flexDirection: 'row'}}>
+          <View style={{flex: 0.05, alignItems: 'center', flexDirection: 'row'}}>
             <View style={{flex: 0.85}}>
               <Text style={{ fontSize: 15}}>All-Day</Text>
             </View>
@@ -232,10 +238,10 @@ class EventForm extends React.Component {
           <View style={{flex: 0.1, justifyContent: 'center', display: this.state.allDay ? 'flex' : 'flex'}}>
             <Text style={{ fontSize: 15}}>Start Time</Text>
             <DatePicker
-              style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
+              style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
               date={this.state.startTime}
               mode="time"
-              placeholder="select date"
+              placeholder="Pick a time"
               format="HH:mm"
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
@@ -261,7 +267,7 @@ class EventForm extends React.Component {
           <View style={{flex: 0.1, justifyContent: 'center', width: '100%', display: this.state.allDay ? 'flex' : 'flex'}}>
             <Text>Due Time</Text>
             <DatePicker
-              style={{width: 200, borderWidth: 0, alignItems: 'flex-start'}}
+              style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
               date={this.state.endTime}
               mode="time"
               iconComponent={(
@@ -276,7 +282,7 @@ class EventForm extends React.Component {
                 />
               )}
               disabled={this.state.startTime === null}
-              placeholder="select date"
+              placeholder="Pick a time"
               format="HH:mm"
               minDate={this.state.startTime}
               confirmBtnText="Confirm"

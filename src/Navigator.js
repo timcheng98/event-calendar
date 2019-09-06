@@ -11,6 +11,7 @@ import DrawerContent from './containers/DrawerContent';
 
 export const HomeNavigator = createStackNavigator({
   Home,
+  EventEditForm,
   CalendarMonth
 },
 {
