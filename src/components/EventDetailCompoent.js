@@ -75,6 +75,7 @@ export default class EventDetail extends Component {
               flex: 0.15,
               paddingTop: this.props.singleDay ? '5%' : null,
               alignItems: 'center',
+              justifyContent: this.props.weekMode ? 'flex-end' : null,
               borderBottomWidth: 1 / 3,
               borderColor: '#8D8D8D'
             }}

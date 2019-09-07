@@ -8,6 +8,7 @@ import {
 import { SafeAreaView } from 'react-navigation';
 import moment from 'moment';
 import CalendarMonth from '../../components/CalendarMonth';
+import CalendarWeek from '../../components/CalendarWeek';
 import * as Main from '../../core/Main';
 import EventDetailComponent from '../../components/EventDetailCompoent';
 
@@ -268,7 +269,7 @@ export const Home = (props) => {
                     </TabHeading>
                     )}
                 >
-                  {/* <Records navigation={this.props.navigation} /> */}
+                  <CalendarWeek {...props}/>
                 </Tab>
                 <Tab
                   textStyle={{ fontSize: 12, color: '#4A4A4A' }}

@@ -1,13 +1,12 @@
 import React from 'react';
 import {
-  View, Modal, TouchableWithoutFeedback, FlatList, Text
+  View, Modal, TouchableOpacity, FlatList, Text
 } from 'react-native';
 import { Spinner, Card, Icon } from 'native-base';
 import {Calendar} from 'react-native-calendars';
 import moment from 'moment';
 import EventDetailComponent from './EventDetailCompoent';
 import * as Main from '../core/Main';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 class CalendarMonth extends React.Component {
   constructor(props) {
