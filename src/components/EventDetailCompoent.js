@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
-import { Card, Icon } from 'native-base';
+import React, {Component} from 'react';
+import {Text, View, TouchableOpacity} from 'react-native';
+import {Card, Icon} from 'native-base';
 import * as Main from '../core/Main';
 
 export default class EventDetail extends Component {
@@ -14,14 +14,8 @@ export default class EventDetail extends Component {
 
   render() {
     const {
-      title,
-      startTime,
-      endTime,
-      remark,
-      date,
-      allDay
+      title, startTime, endTime, remark, date, allDay
     } = this.props.eventData;
-    console.log('a', this.props.eventData);
     return (
       <View
         style={{
@@ -82,7 +76,7 @@ export default class EventDetail extends Component {
           >
             <Text style={{fontSize: 25, color: '#4A4A4A'}}>{title}</Text>
           </View>
-          <View style={{ flex: 0.2, justifyContent: 'center'}}>
+          <View style={{flex: 0.2, justifyContent: 'center'}}>
             <View
               style={{
                 flex: 0.2,
@@ -95,7 +89,7 @@ export default class EventDetail extends Component {
             >
               <View style={{flex: 0.1}}>
                 <Icon
-                  style={{ fontSize: 18, color: '#4A4A4A' }}
+                  style={{fontSize: 18, color: '#4A4A4A'}}
                   type="MaterialCommunityIcons"
                   name="circle-medium"
                 />
@@ -111,11 +105,9 @@ export default class EventDetail extends Component {
                   {date}
                 </Text>
               </View>
-              <View style={{flex: 0.3 }}>
+              <View style={{flex: 0.3}}>
                 <Text style={{fontSize: 12, color: '#2E2E2E'}}>
-                  {allDay
-                    ? 'Whole Day'
-                    : `${startTime} - ${endTime}`}
+                  {allDay ? 'Whole Day' : `${startTime} - ${endTime}`}
                 </Text>
               </View>
 
@@ -126,11 +118,10 @@ export default class EventDetail extends Component {
                     await Main.removeStorage('event_id');
                     await Main.setStorage('event_id', this.props.eventData.id);
                     this.props.navigation.navigate('EventEditForm');
-
                   }}
                 >
                   <Icon
-                    style={{ fontSize: 18, color: '#2E2E2E', paddingLeft: 10 }}
+                    style={{fontSize: 18, color: '#2E2E2E', paddingLeft: 10}}
                     type="MaterialCommunityIcons"
                     name="square-edit-outline"
                   />
@@ -138,7 +129,7 @@ export default class EventDetail extends Component {
               </View>
             </View>
           </View>
-          <View style={{ flex: 0.5, justifyContent: 'flex-start', paddingBottom: '10%'}}>
+          <View style={{flex: 0.5, justifyContent: 'flex-start', paddingBottom: '10%'}}>
             <Text
               style={{
                 color: '#4A4A4A',
@@ -150,15 +141,14 @@ export default class EventDetail extends Component {
               Remark
             </Text>
             {remark === undefined || remark === '' ? (
-              <Text style={{color: '#CCCCCC', fontSize: 15, alignSelf: 'center', paddingTop: 15}}>
+              <Text style={{
+                color: '#CCCCCC', fontSize: 15, alignSelf: 'center', paddingTop: 15
+              }}
+              >
                 No Remark
               </Text>
             ) : (
-            <Text
-              style={{color: '#4A4A4A', fontSize: 15}}
-            >
-              {remark}
-            </Text>
+              <Text style={{color: '#4A4A4A', fontSize: 15}}>{remark}</Text>
             )}
           </View>
         </Card>

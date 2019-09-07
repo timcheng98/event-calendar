@@ -19,7 +19,7 @@ export async function setEvents(value) {
 }
 
 export async function getEvents() {
-  if (await getStorage('events') === null) {
+  if ((await getStorage('events')) === null) {
     await setEvents('events');
   }
   return getStorage('events');
@@ -30,10 +30,18 @@ export async function setModalVisible(value) {
 }
 
 export async function getModalVisible() {
-  if (await getStorage('modalVisible') === null) {
+  if ((await getStorage('modalVisible')) === null) {
     await setModalVisible(true);
   }
   return getStorage('modalVisible');
 }
 
+export function getKey(key) {
+  let item = Object.keys(key)[0];
+  return item;
+}
 
+export function getValue(value) {
+  let item = Object.values(value)[0];
+  return item;
+}

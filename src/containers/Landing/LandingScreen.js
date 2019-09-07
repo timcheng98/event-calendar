@@ -1,12 +1,6 @@
-import React, { Component } from 'react';
-import {
-  View
-} from 'native-base';
-import {
-  ActivityIndicator,
-  SafeAreaView,
-  StyleSheet
-} from 'react-native';
+import React, {Component} from 'react';
+import {View} from 'native-base';
+import {ActivityIndicator, SafeAreaView, StyleSheet} from 'react-native';
 import * as Main from '../../core/Main';
 
 class LandingScreen extends Component {
@@ -21,7 +15,7 @@ class LandingScreen extends Component {
       this.loadingTimerDone = true;
     }, 1000);
 
-    let markedDates = await Main.getStorage('markedDates');
+    await Main.getStorage('markedDates');
     this.props.navigation.navigate('DrawerNavigator');
   }
 
@@ -29,7 +23,9 @@ class LandingScreen extends Component {
     return (
       <SafeAreaView
         style={{
-          flex: 1, justifyContent: 'center', alignItems: 'center'
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
         <View style={styles.loading}>

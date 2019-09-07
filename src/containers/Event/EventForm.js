@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch } from 'react-native';
-import { Icon } from 'native-base';
+import {
+  View, Text, TouchableOpacity, ScrollView, TextInput, Switch
+} from 'react-native';
+import {Icon} from 'native-base';
 import moment from 'moment';
 import DatePicker from 'react-native-datepicker';
 import uuidv4 from 'uuid/v4';
@@ -13,17 +15,14 @@ class EventForm extends React.Component {
     },
     headerStyle: {
       backgroundColor: '#FFFFFF',
-      // marginTop: -40,
       borderBottomWidth: 0
     },
-    headerForceInset: { top: 'never', bottom: 'never' },
+    headerForceInset: {top: 'never', bottom: 'never'},
     headerLeft: (
       <View>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Home')}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Icon
-            style={{ fontSize: 40, color: '#4A4A4A', paddingLeft: 10 }}
+            style={{fontSize: 40, color: '#4A4A4A', paddingLeft: 10}}
             type="MaterialCommunityIcons"
             name="chevron-left"
           />
@@ -33,14 +32,9 @@ class EventForm extends React.Component {
     headerRight: (
       <View>
         <TouchableOpacity
-          onPress={ async () => {
+          onPress={async () => {
             const {
-              title,
-              date,
-              startTime,
-              endTime,
-              remark,
-              allDay
+              title, date, startTime, endTime, remark, allDay
             } = navigation.state.params;
             let newEvent = {
               [date]: {
@@ -56,7 +50,6 @@ class EventForm extends React.Component {
                 selectedColor: '#008CBF'
               }
             };
-            // console.log('submit params', navigation.state.params)
             const markedDates = await Main.getStorage('markedDates');
             markedDates.push(newEvent);
             await Main.setStorage('markedDates', markedDates);
@@ -68,22 +61,10 @@ class EventForm extends React.Component {
             });
 
             await Main.setStorage('markedDatesObj', markedDatesObj);
-
-            console.log('object', markedDatesObj);
-
-            // console.log('params title', navigation.state.params.title);
-            // console.log('params date', navigation.state.params.date);
-            // console.log('params start', navigation.state.params.startTime);
-            // console.log('params end', navigation.state.params.endTime);
-            // console.log('params remark', navigation.state.params.remark);
             navigation.navigate('Home', {newEvent});
           }}
         >
-          <Icon
-            style={{ fontSize: 30, paddingRight: 20}}
-            type="MaterialIcons"
-            name="add-box"
-          />
+          <Icon style={{fontSize: 30, paddingRight: 20}} type="MaterialIcons" name="add-box" />
         </TouchableOpacity>
       </View>
     )
@@ -99,19 +80,16 @@ class EventForm extends React.Component {
       endTime: null,
       allDay: false
     };
-    this.props.navigation.addListener(
-      'willFocus',
-      () => {
-        this.setState({
-          title: '',
-          remark: '',
-          date: null,
-          startTime: null,
-          endTime: null,
-          allDay: false
-        });
-      }
-    );
+    this.props.navigation.addListener('willFocus', () => {
+      this.setState({
+        title: '',
+        remark: '',
+        date: null,
+        startTime: null,
+        endTime: null,
+        allDay: false
+      });
+    });
   }
 
   async componentDidMount() {
@@ -126,9 +104,10 @@ class EventForm extends React.Component {
   }
 
   toggleSwitch = async (value) => {
-    await this.setState({allDay: value});
+    this.setState({allDay: value});
     if (this.state.allDay) {
-      this.setState({startTime: '00:00', endTime: '23:59'}); this.props.navigation.setParams({startTime: '00:00', endTime: '23:59', allDay: true});
+      this.setState({startTime: '00:00', endTime: '23:59'});
+      this.props.navigation.setParams({startTime: '00:00', endTime: '23:59', allDay: true});
     } else {
       this.setState({startTime: null, endTime: null, allDay: false});
       this.props.navigation.setParams({startTime: null, endTime: null});
@@ -136,22 +115,18 @@ class EventForm extends React.Component {
     console.log(this.state.allDay);
     console.log(typeof this.state.startTime);
     console.log(this.state.endTime);
-  }
+  };
 
   render() {
-    // console.log('title', this.state.title);
-    console.log('start', typeof this.state.startTime);
-    console.log('end', this.state.endTime);
-    // console.log('remark', this.state.remark);
     return (
-      <View style={{ flex: 1, paddingHorizontal: '5%'}}>
+      <View style={{flex: 1, paddingHorizontal: '5%'}}>
         <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: 'space-between'
           }}
         >
-          <View style={{ flex: 0.1}}>
+          <View style={{flex: 0.1}}>
             <Text
               style={{
                 color: '#1A1A1A',
@@ -180,7 +155,7 @@ class EventForm extends React.Component {
             }}
           >
             <Icon
-              style={{ fontSize: 30, color: '#8D8D8D', paddingRight: 5}}
+              style={{fontSize: 30, color: '#8D8D8D', paddingRight: 5}}
               type="MaterialCommunityIcons"
               name="calendar-text"
             />
@@ -195,7 +170,7 @@ class EventForm extends React.Component {
             />
           </View>
           <View style={{flex: 0.1, justifyContent: 'center'}}>
-            <Text style={{ fontSize: 15}}>Date</Text>
+            <Text style={{fontSize: 15}}>Date</Text>
             <DatePicker
               style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
               date={this.state.date}
@@ -226,7 +201,7 @@ class EventForm extends React.Component {
           </View>
           <View style={{flex: 0.05, alignItems: 'center', flexDirection: 'row'}}>
             <View style={{flex: 0.85}}>
-              <Text style={{ fontSize: 15}}>Whole Day</Text>
+              <Text style={{fontSize: 15}}>Whole Day</Text>
             </View>
             <View style={{flex: 0.15}}>
               <Switch
@@ -237,8 +212,14 @@ class EventForm extends React.Component {
               />
             </View>
           </View>
-          <View style={{flex: 0.1, justifyContent: 'center', display: this.state.allDay ? 'none' : 'flex'}}>
-            <Text style={{ fontSize: 15}}>Start Time</Text>
+          <View
+            style={{
+              flex: 0.1,
+              justifyContent: 'center',
+              display: this.state.allDay ? 'none' : 'flex'
+            }}
+          >
+            <Text style={{fontSize: 15}}>Start Time</Text>
             <DatePicker
               style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
               date={this.state.startTime}
@@ -262,11 +243,18 @@ class EventForm extends React.Component {
               }}
               onDateChange={(startTime) => {
                 this.setState({startTime});
-                this.props.navigation.setParams({startTime})
+                this.props.navigation.setParams({startTime});
               }}
             />
           </View>
-          <View style={{flex: 0.1, justifyContent: 'center', width: '100%', display: this.state.allDay ? 'none' : 'flex'}}>
+          <View
+            style={{
+              flex: 0.1,
+              justifyContent: 'center',
+              width: '100%',
+              display: this.state.allDay ? 'none' : 'flex'
+            }}
+          >
             <Text>Due Time</Text>
             <DatePicker
               style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
@@ -282,7 +270,7 @@ class EventForm extends React.Component {
                     display: this.state.startTime === null ? 'flex' : 'none'
                   }}
                 />
-              )}
+)}
               disabled={this.state.startTime === null}
               placeholder="Pick a time"
               format="HH:mm"
@@ -308,7 +296,8 @@ class EventForm extends React.Component {
                 }
               }}
               onDateChange={(endTime) => {
-                this.setState({endTime}); this.props.navigation.setParams({endTime});
+                this.setState({endTime});
+                this.props.navigation.setParams({endTime});
               }}
             />
           </View>
@@ -323,7 +312,7 @@ class EventForm extends React.Component {
           >
             <Text style={{fontSize: 15}}>Repeat</Text>
             <Icon
-              style={{ fontSize: 20, paddingTop: '0.5%', color: '#8D8D8D'}}
+              style={{fontSize: 20, paddingTop: '0.5%', color: '#8D8D8D'}}
               type="MaterialIcons"
               name="loop"
             />
@@ -338,7 +327,7 @@ class EventForm extends React.Component {
             }}
           >
             <Icon
-              style={{ fontSize: 25, paddingTop: '0.5%', color: '#8D8D8D'}}
+              style={{fontSize: 25, paddingTop: '0.5%', color: '#8D8D8D'}}
               type="MaterialCommunityIcons"
               name="map-marker-outline"
             />
@@ -354,16 +343,16 @@ class EventForm extends React.Component {
             }}
           >
             <Icon
-              style={{ fontSize: 25, paddingTop: '0.5%', color: '#8D8D8D'}}
+              style={{fontSize: 25, paddingTop: '0.5%', color: '#8D8D8D'}}
               type="MaterialIcons"
               name="notifications-none"
             />
             <Text style={{fontSize: 15}}>Notifications</Text>
           </View>
-          <View style={{ flex: 0.3, paddingTop: '5%'}}>
-            <View style={{ flexDirection: 'row'}}>
+          <View style={{flex: 0.3, paddingTop: '5%'}}>
+            <View style={{flexDirection: 'row'}}>
               <Icon
-                style={{ fontSize: 20, paddingRight: 5, color: '#8D8D8D'}}
+                style={{fontSize: 20, paddingRight: 5, color: '#8D8D8D'}}
                 type="MaterialCommunityIcons"
                 name="calendar-edit"
               />
@@ -372,10 +361,10 @@ class EventForm extends React.Component {
             <TextInput
               multiline
               placeholder="Remarks"
-              style={{ width: '100%', borderColor: '#DCD6D6', borderBottomWidth: 1}}
+              style={{width: '100%', borderColor: '#DCD6D6', borderBottomWidth: 1}}
               onChangeText={(remark) => {
                 this.setState({remark});
-                this.props.navigation.setParams({remark})
+                this.props.navigation.setParams({remark});
               }}
               value={this.state.remark}
             />
