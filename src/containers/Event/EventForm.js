@@ -90,8 +90,8 @@ class EventForm extends React.Component {
 
   async componentDidMount() {
     let markedDates = [];
-    // await Main.removeStorage('markedDates');
-    // await Main.removeStorage('markedDatesObj');
+    await Main.removeStorage('markedDates');
+    await Main.removeStorage('markedDatesObj');
     if (await Main.getStorage('markedDates')) {
       markedDates = await Main.getStorage('markedDates');
     } else {
