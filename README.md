@@ -5,11 +5,16 @@ This is an application for event management.
 
 ## Installation
 
-```bash
 ##IOS
+```bash
 $ npm ci
 $ cd ios && pod install && cd ..
 $ react-native run-ios
+```
+##Android
+```bash
+$ npm ci
+$ react-native run-android
 ```
 
 ## Contributing
