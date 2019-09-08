@@ -1,11 +1,12 @@
 import React from 'react';
 import {
-  View, Text, TouchableOpacity, ScrollView, TextInput, Switch
+  View, Text, TouchableOpacity, ScrollView, TextInput, Switch, StyleSheet
 } from 'react-native';
 import {Icon} from 'native-base';
 import moment from 'moment';
 import DatePicker from 'react-native-datepicker';
 import uuidv4 from 'uuid/v4';
+import Header from '../../components/Header';
 import * as Main from '../../core/Main';
 
 class EventForm extends React.Component {
@@ -19,54 +20,49 @@ class EventForm extends React.Component {
     },
     headerForceInset: {top: 'never', bottom: 'never'},
     headerLeft: (
-      <View>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Icon
-            style={{fontSize: 40, color: '#4A4A4A', paddingLeft: 10}}
-            type="MaterialCommunityIcons"
-            name="chevron-left"
-          />
-        </TouchableOpacity>
-      </View>
+      <Header
+        action={() => navigation.navigate('Home')}
+        iconName="chevron-left"
+        type="MaterialCommunityIcons"
+      />
     ),
     headerRight: (
-      <View>
-        <TouchableOpacity
-          onPress={async () => {
-            const {
-              title, date, startTime, endTime, remark, allDay
-            } = navigation.state.params;
-            let newEvent = {
-              [date]: {
-                id: uuidv4(),
-                title,
-                startTime,
-                endTime,
-                remark,
-                marked: true,
-                dotColor: 'black',
-                selected: true,
-                allDay,
-                selectedColor: '#008CBF'
-              }
-            };
-            const markedDates = await Main.getStorage('markedDates');
-            markedDates.push(newEvent);
-            await Main.setStorage('markedDates', markedDates);
+      <Header
+        action={async () => {
+          const {
+            title, date, startTime, endTime, remark, allDay
+          } = navigation.state.params;
+          let newEvent = {
+            [date]: {
+              id: uuidv4(),
+              title,
+              startTime,
+              endTime,
+              remark,
+              marked: true,
+              dotColor: 'black',
+              selected: true,
+              allDay,
+              selectedColor: '#008CBF'
+            }
+          };
+          const markedDates = await Main.getStorage('markedDates');
+          markedDates.push(newEvent);
+          await Main.setStorage('markedDates', markedDates);
 
-            let markedDatesObj = {};
-            markedDates.map((item) => {
-              markedDatesObj = Object.assign(markedDatesObj, item);
-              return markedDatesObj;
-            });
+          let markedDatesObj = {};
+          markedDates.map((item) => {
+            markedDatesObj = Object.assign(markedDatesObj, item);
+            return markedDatesObj;
+          });
 
-            await Main.setStorage('markedDatesObj', markedDatesObj);
-            navigation.navigate('Home', {newEvent});
-          }}
-        >
-          <Icon style={{fontSize: 30, paddingRight: 20}} type="MaterialIcons" name="add-box" />
-        </TouchableOpacity>
-      </View>
+          await Main.setStorage('markedDatesObj', markedDatesObj);
+          navigation.navigate('Home', {newEvent});
+        }}
+
+        type="MaterialIcons"
+        iconName="add-box"
+      />
     )
   });
 
@@ -104,7 +100,7 @@ class EventForm extends React.Component {
   }
 
   toggleSwitch = async (value) => {
-    this.setState({allDay: value});
+    await this.setState({allDay: value});
     if (this.state.allDay) {
       this.setState({startTime: '00:00', endTime: '23:59'});
       this.props.navigation.setParams({startTime: '00:00', endTime: '23:59', allDay: true});
@@ -121,41 +117,25 @@ class EventForm extends React.Component {
     return (
       <View style={{flex: 1, paddingHorizontal: '5%'}}>
         <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: 'space-between'
-          }}
+          contentContainerStyle={styles.scrollView}
         >
           <View style={{flex: 0.1}}>
             <Text
-              style={{
-                color: '#1A1A1A',
-                fontWeight: 'bold',
-                fontSize: 30
-              }}
+              style={styles.newEvent}
             >
               New Event
             </Text>
             <Text
-              style={{
-                color: '#4A4A4A',
-                fontSize: 15
-              }}
+              style={styles.mdText}
             >
               Create your personal schedule
             </Text>
           </View>
           <View
-            style={{
-              flex: 0.1,
-              alignItems: 'center',
-              flexDirection: 'row',
-              borderBottomWidth: 1,
-              borderColor: '#EFEFEF'
-            }}
+            style={styles.title}
           >
             <Icon
-              style={{fontSize: 30, color: '#8D8D8D', paddingRight: 5}}
+              style={styles.lgIcon}
               type="MaterialCommunityIcons"
               name="calendar-text"
             />
@@ -172,7 +152,7 @@ class EventForm extends React.Component {
           <View style={{flex: 0.1, justifyContent: 'center'}}>
             <Text style={{fontSize: 15}}>Date</Text>
             <DatePicker
-              style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
+              style={styles.datePicker}
               date={this.state.date}
               mode="date"
               placeholder="Pick a Date"
@@ -219,9 +199,9 @@ class EventForm extends React.Component {
               display: this.state.allDay ? 'none' : 'flex'
             }}
           >
-            <Text style={{fontSize: 15}}>Start Time</Text>
+            <Text style={styles.mdText}>Start Time</Text>
             <DatePicker
-              style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
+              style={styles.datePicker}
               date={this.state.startTime}
               mode="time"
               placeholder="Pick a time"
@@ -257,7 +237,7 @@ class EventForm extends React.Component {
           >
             <Text>Due Time</Text>
             <DatePicker
-              style={{width: '100%', borderWidth: 0, alignItems: 'flex-start'}}
+              style={styles.datePicker}
               date={this.state.endTime}
               mode="time"
               iconComponent={(
@@ -270,7 +250,7 @@ class EventForm extends React.Component {
                     display: this.state.startTime === null ? 'flex' : 'none'
                   }}
                 />
-)}
+              )}
               disabled={this.state.startTime === null}
               placeholder="Pick a time"
               format="HH:mm"
@@ -291,8 +271,7 @@ class EventForm extends React.Component {
                 dateInput: {
                   borderWidth: 0,
                   alignItems: 'flex-start',
-                  marginRight: 100,
-                  width: '150%'
+                  width: '100%'
                 }
               }}
               onDateChange={(endTime) => {
@@ -302,48 +281,30 @@ class EventForm extends React.Component {
             />
           </View>
           <View
-            style={{
-              flex: 0.1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              borderBottomWidth: 1,
-              borderColor: '#EFEFEF'
-            }}
+            style={styles.title}
           >
             <Text style={{fontSize: 15}}>Repeat</Text>
             <Icon
-              style={{fontSize: 20, paddingTop: '0.5%', color: '#8D8D8D'}}
+              style={styles.mdIcon}
               type="MaterialIcons"
               name="loop"
             />
           </View>
           <View
-            style={{
-              flex: 0.1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              borderBottomWidth: 1,
-              borderColor: '#EFEFEF'
-            }}
+            style={styles.title}
           >
             <Icon
-              style={{fontSize: 25, paddingTop: '0.5%', color: '#8D8D8D'}}
+              style={styles.mdIcon}
               type="MaterialCommunityIcons"
               name="map-marker-outline"
             />
             <Text style={{fontSize: 15}}>Add Location</Text>
           </View>
           <View
-            style={{
-              flex: 0.1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              borderBottomWidth: 1,
-              borderColor: '#EFEFEF'
-            }}
+            style={styles.title}
           >
             <Icon
-              style={{fontSize: 25, paddingTop: '0.5%', color: '#8D8D8D'}}
+              style={styles.mdIcon}
               type="MaterialIcons"
               name="notifications-none"
             />
@@ -352,7 +313,7 @@ class EventForm extends React.Component {
           <View style={{flex: 0.3, paddingTop: '5%'}}>
             <View style={{flexDirection: 'row'}}>
               <Icon
-                style={{fontSize: 20, paddingRight: 5, color: '#8D8D8D'}}
+                style={styles.mdIcon}
                 type="MaterialCommunityIcons"
                 name="calendar-edit"
               />
@@ -361,7 +322,7 @@ class EventForm extends React.Component {
             <TextInput
               multiline
               placeholder="Remarks"
-              style={{width: '100%', borderColor: '#DCD6D6', borderBottomWidth: 1}}
+              style={styles.textInput}
               onChangeText={(remark) => {
                 this.setState({remark});
                 this.props.navigation.setParams({remark});
@@ -374,5 +335,48 @@ class EventForm extends React.Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  scrollView: {
+    flexGrow: 1,
+    justifyContent: 'space-between'
+  },
+  newEvent: {
+    color: '#1A1A1A',
+    fontWeight: 'bold',
+    fontSize: 30
+  },
+  mdText: {
+    color: '#4A4A4A',
+    fontSize: 15
+  },
+  textInput: {
+    width: '100%',
+    borderColor: '#DCD6D6',
+    borderBottomWidth: 1
+  },
+  title: {
+    flex: 0.1,
+    alignItems: 'center',
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#EFEFEF'
+  },
+  lgIcon: {
+    fontSize: 25,
+    color: '#8D8D8D',
+    paddingRight: 5
+  },
+  mdIcon: {
+    fontSize: 18,
+    color: '#8D8D8D',
+    paddingRight: 5
+  },
+  datePicker: {
+    width: '100%',
+    borderWidth: 0,
+    alignItems: 'flex-start'
+  }
+});
 
 export default EventForm;

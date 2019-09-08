@@ -1,9 +1,10 @@
 import React from 'react';
 import {
-  View, Text, TouchableOpacity, ScrollView, TextInput, Switch
+  View, Text, ScrollView, TextInput, Switch, StyleSheet
 } from 'react-native';
 import {Button, Icon} from 'native-base';
 import DatePicker from 'react-native-datepicker';
+import Header from '../../components/Header';
 import * as Main from '../../core/Main';
 
 class EventEditForm extends React.Component {
@@ -17,15 +18,11 @@ class EventEditForm extends React.Component {
     },
     headerForceInset: {top: 'never', bottom: 'never'},
     headerLeft: (
-      <View>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Icon
-            style={{fontSize: 40, color: '#4A4A4A', paddingLeft: 10}}
-            type="MaterialCommunityIcons"
-            name="chevron-left"
-          />
-        </TouchableOpacity>
-      </View>
+      <Header
+        action={() => navigation.navigate('Home')}
+        type="MaterialCommunityIcons"
+        iconName="chevron-left"
+      />
     ),
     headerRight: null
   });
@@ -96,9 +93,6 @@ class EventEditForm extends React.Component {
       this.setState({startTime: null, endTime: null});
       this.props.navigation.setParams({startTime: null, endTime: null});
     }
-    // console.log(this.state.allDay);
-    // console.log(typeof this.state.startTime);
-    // console.log(this.state.endTime);
   };
 
   render() {
@@ -151,7 +145,6 @@ class EventEditForm extends React.Component {
               value={title}
               onChangeText={(value) => {
                 this.setState({title: value});
-                // this.props.navigation.setParams({title});
               }}
             />
           </View>
@@ -181,7 +174,6 @@ class EventEditForm extends React.Component {
               }}
               onDateChange={(value) => {
                 this.setState({date: value});
-                // this.props.navigation.setParams({date})
               }}
             />
           </View>
@@ -411,4 +403,6 @@ class EventEditForm extends React.Component {
   }
 }
 
+const styles = StyleSheet.create({
+})
 export default EventEditForm;

@@ -8,7 +8,6 @@ export default class EventPreviewTemplate extends Component {
       title, startTime, endTime, id, allDay, remark
     } = this.props.dataSet;
     let {date} = this.props;
-    console.log('123', this.props.date);
 
     return (
       <View style={{flex: 1}}>
@@ -29,16 +28,16 @@ export default class EventPreviewTemplate extends Component {
           <Card
             style={{
               flex: 1,
-              paddingVertical: '5%',
+              paddingHorizontal: '3%',
               flexDirection: 'row',
               alignItems: 'center',
+              justifyContent: 'center',
               width: '90%'
             }}
           >
             <View
               style={{
                 flex: 0.4,
-                paddingHorizontal: '5%',
                 paddingVertical: '5%'
               }}
             >

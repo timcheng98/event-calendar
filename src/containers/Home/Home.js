@@ -13,7 +13,8 @@ import {
 import moment from 'moment';
 import CalendarMonth from '../../components/CalendarMonth';
 import CalendarWeek from '../../components/CalendarWeek';
-import EventDetailComponent from '../../components/EventDetailCompoent';
+import EventDetailComponent from '../../components/EventDetailComponent';
+import Header from '../../components/Header';
 import * as Main from '../../core/Main';
 
 export const Home = (props) => {
@@ -50,11 +51,14 @@ export const Home = (props) => {
       let date = Main.getKey(item);
       let date_year = moment(date).year();
       let date_month = moment(date).month();
+      let date_day = moment(date).date();
 
       if (date_year === moment().year()) {
         if (date_month === moment().month()) {
-          count++;
-          setCountMonth(count);
+          if (date_day >= moment().date()) {
+            count++;
+            setCountMonth(count);
+          }
         }
       }
       return item;
@@ -374,14 +378,12 @@ Home.navigationOptions = ({navigation}) => ({
   },
   headerForceInset: {top: 'never', bottom: 'never'},
   headerLeft: (
-    <View style={{marginLeft: 20, flex: 1, flexDirection: 'row'}}>
-      <TouchableOpacity onPress={() => navigation.openDrawer()}>
-        <Icon
-          style={{fontSize: 30, color: '#4A4A4A', marginRight: 10}}
-          type="MaterialIcons"
-          name="sort"
-        />
-      </TouchableOpacity>
+    <View style={{flex: 1, flexDirection: 'row'}}>
+      <Header
+        action={() => navigation.openDrawer()}
+        type="MaterialIcons"
+        iconName="sort"
+      />
       <View style={{alignSelf: 'center'}}>
         <Text style={{fontSize: 15, fontWeight: '400'}}>
           {moment().format('DD MMMM, YYYY')}
@@ -391,16 +393,16 @@ Home.navigationOptions = ({navigation}) => ({
   ),
   headerRight: (
     <View style={{flex: 1, flexDirection: 'row'}}>
-      <View style={{marginRight: 10}}>
-        <TouchableOpacity>
-          <Icon style={{fontSize: 30, color: '#4A4A4A'}} type="MaterialIcons" name="search" />
-        </TouchableOpacity>
-      </View>
-      <View style={{marginRight: 20}}>
-        <TouchableOpacity onPress={() => navigation.navigate('EventForm')}>
-          <Icon style={{fontSize: 30}} type="MaterialIcons" name="add-box" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        // action={}
+        type="MaterialIcons"
+        iconName="search"
+      />
+      <Header
+        action={() => navigation.navigate('EventForm')}
+        type="MaterialIcons"
+        iconName="add-box"
+      />
     </View>
   )
 });

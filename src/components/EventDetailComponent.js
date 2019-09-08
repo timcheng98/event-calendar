@@ -3,13 +3,9 @@ import {Text, View, TouchableOpacity} from 'react-native';
 import {Card, Icon} from 'native-base';
 import * as Main from '../core/Main';
 
-export default class EventDetail extends Component {
+export default class EventDetailComponent extends Component {
   constructor(props) {
     super(props);
-  }
-
-  async componentDidMount() {
-    this.props.navigation.setParams({isEventSelected: true});
   }
 
   render() {

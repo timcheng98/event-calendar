@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage';
+import moment from 'moment';
 
 export async function getStorage(key) {
   let item = await AsyncStorage.getItem(key);
@@ -44,4 +45,13 @@ export function getKey(key) {
 export function getValue(value) {
   let item = Object.values(value)[0];
   return item;
+}
+
+export function getDateFromWeek(week, year, addDay = 0, format = 'YYYY-MM-DD') {
+  return moment()
+    .day('Sunday')
+    .year(year)
+    .week(week)
+    .add(addDay, 'd')
+    .format(format);
 }

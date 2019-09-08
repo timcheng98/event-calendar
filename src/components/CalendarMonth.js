@@ -5,7 +5,7 @@ import {
 import {Spinner, Icon} from 'native-base';
 import {Calendar} from 'react-native-calendars';
 import moment from 'moment';
-import EventDetailComponent from './EventDetailCompoent';
+import EventDetailComponent from './EventDetailComponent';
 import * as Main from '../core/Main';
 
 class CalendarMonth extends React.Component {
