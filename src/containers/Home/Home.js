@@ -200,8 +200,17 @@ export const Home = (props) => {
           <View style={{paddingVertical: '2%'}}>
             <Text style={{color: '#8D8D8D', fontSize: 15}}>No Upcoming Event</Text>
           </View>
-          <View>
+          <View style={{alignItems: 'center'}}>
             <Text style={{color: '#CCCCCC', fontSize: 15}}>Click “+” button to create event</Text>
+            <TouchableOpacity
+              onPress={() => props.navigation.navigate('EventForm')}
+            >
+              <Icon
+                style={{fontSize: 20, color: '#008CBF', padding: 10}}
+                type="MaterialIcons"
+                name="add-circle-outline"
+              />
+            </TouchableOpacity>
           </View>
         </View>
       );

@@ -44,8 +44,6 @@ class EventEditForm extends React.Component {
   async componentDidMount() {
     let markedDates = [];
     let id = await Main.getStorage('event_id');
-    // AsynStorage.removeItem('markedDates');
-    // AsynStorage.removeItem('markedDatesObj');
     if (await Main.getStorage('markedDates')) {
       markedDates = await Main.getStorage('markedDates');
       this.setState({markedDates});
@@ -375,6 +373,8 @@ class EventEditForm extends React.Component {
                         remark,
                         allDay,
                         marked: true,
+                        selectedColor: '#008CBF',
+                        selected: true,
                         dotColor: 'black'
                       }
                     };

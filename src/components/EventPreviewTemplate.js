@@ -32,7 +32,18 @@ export default class EventPreviewTemplate extends Component {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '90%'
+              width: '90%',
+              backgroundColor: '#FFFFFF',
+              borderColor: '#FFFFFF',
+              shadowColor: '#FFFFFF',
+              shadowOffset: {
+                width: 0,
+                height: 2
+              },
+              shadowOpacity: 0.3,
+              shadowRadius: 3.84,
+              borderRadius: 5,
+              elevation: 3
             }}
           >
             <View
