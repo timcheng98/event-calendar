@@ -22,7 +22,7 @@ export default class EventPreviewTemplate extends Component {
               id,
               allDay
             };
-            this.props.navigation.setParams({visible: true, selectedEvent: eventObj});
+            this.props.navigation.setParams({visible: true, selectedEvent: eventObj, date});
           }}
         >
           <Card
@@ -33,9 +33,9 @@ export default class EventPreviewTemplate extends Component {
               alignItems: 'center',
               justifyContent: 'center',
               width: '90%',
-              backgroundColor: '#FFFFFF',
-              borderColor: '#FFFFFF',
-              shadowColor: '#FFFFFF',
+              // backgroundColor: '#FFFFFF',
+              // borderColor: '#008CBF',
+              shadowColor: '#4A4A4A',
               shadowOffset: {
                 width: 0,
                 height: 2
@@ -49,7 +49,9 @@ export default class EventPreviewTemplate extends Component {
             <View
               style={{
                 flex: 0.4,
-                paddingVertical: '5%'
+                paddingVertical: '5%',
+                justifyContent: 'center',
+                alignItems: 'center'
               }}
             >
               <Text
@@ -62,12 +64,12 @@ export default class EventPreviewTemplate extends Component {
                 {title}
               </Text>
             </View>
-            <View style={{flex: 0.3}}>
+            <View style={{flex: 0.3, justifyContent: 'center', alignItems: 'center'}}>
               <Text style={{color: '#4A4A4A', fontSize: 12}}>
                 {allDay ? 'Whole Day' : `${startTime} - ${endTime}`}
               </Text>
             </View>
-            <View style={{flex: 0.3}}>
+            <View style={{flex: 0.3, justifyContent: 'center', alignItems: 'center'}}>
               <Icon
                 style={{fontSize: 25, color: '#2E2E2E', paddingLeft: 10}}
                 type="MaterialCommunityIcons"

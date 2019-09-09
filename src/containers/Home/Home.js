@@ -11,9 +11,9 @@ import {
   Card, Icon, Tab, Tabs, TabHeading, Spinner
 } from 'native-base';
 import moment from 'moment';
-import CalendarMonth from '../../components/CalendarMonth';
-import CalendarWeek from '../../components/CalendarWeek';
-import CalendarDay from '../../components/CalendarDay';
+import CalendarMonth from '../Calendar/CalendarMonth';
+import CalendarWeek from '../Calendar/CalendarWeek';
+import CalendarDay from '../Calendar/CalendarDay';
 import EventDetailComponent from '../../components/EventDetailComponent';
 import Header from '../../components/Header';
 import * as Main from '../../core/Main';
@@ -58,7 +58,7 @@ export const Home = (props) => {
       let date_month = moment(date).month();
       let date_day = moment(date).date();
 
-      let weekStart = Main.getDateFromWeek(moment().week(), moment().year(), 0);
+      let today = moment().format('YYYY-MM-DD');
       let weekEnd = Main.getDateFromWeek(moment().week(), moment().year(), 6);
 
       if (date === moment().format('YYYY-MM-DD')) {
@@ -72,7 +72,7 @@ export const Home = (props) => {
             monthCount++;
             setCountMonth(monthCount);
           }
-          if (date >= weekStart && date <= weekEnd) {
+          if (date >= today && date <= weekEnd) {
             weekCount++;
             setCountWeek(weekCount);
           }
@@ -137,7 +137,7 @@ export const Home = (props) => {
                   <View
                     style={{
                       flex: 0.2,
-                      paddingVertical: '3%',
+                      paddingVertical: '2%',
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'flex-start',
@@ -157,13 +157,13 @@ export const Home = (props) => {
                         name="circle-medium"
                       />
                     </View>
-                    <View style={{flex: 0.55}}>
+                    <View style={{flex: 0.55, paddingVertical: '2%'}}>
                       <Text
                         style={{
                           fontSize: 15,
                           color: '#2E2E2E',
                           fontWeight: 'bold',
-                          paddingBottom: '2%'
+                          paddingVertical: '2%'
                         }}
                       >
                         {title}
@@ -171,7 +171,8 @@ export const Home = (props) => {
                       <Text
                         style={{
                           fontSize: 12,
-                          color: '#6A6A6A'
+                          color: '#6A6A6A',
+                          paddingVertical: '2%'
                         }}
                       >
                         {date}
