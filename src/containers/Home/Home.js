@@ -13,6 +13,7 @@ import {
 import moment from 'moment';
 import CalendarMonth from '../../components/CalendarMonth';
 import CalendarWeek from '../../components/CalendarWeek';
+import CalendarDay from '../../components/CalendarDay';
 import EventDetailComponent from '../../components/EventDetailComponent';
 import Header from '../../components/Header';
 import * as Main from '../../core/Main';
@@ -21,6 +22,8 @@ export const Home = (props) => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState({});
   const [countMonth, setCountMonth] = useState(0);
+  const [countWeek, setCountWeek] = useState(0);
+  const [countDay, setCountDay] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const {navigation} = props;
@@ -46,18 +49,32 @@ export const Home = (props) => {
 
   const getMonthlyEvents = async () => {
     let markedDates = await Main.getStorage('markedDates');
-    let count = 0;
+    let monthCount = 0;
+    let weekCount = 0;
+    let dayCount = 0;
     markedDates.map((item) => {
       let date = Main.getKey(item);
       let date_year = moment(date).year();
       let date_month = moment(date).month();
       let date_day = moment(date).date();
 
+      let weekStart = Main.getDateFromWeek(moment().week(), moment().year(), 0);
+      let weekEnd = Main.getDateFromWeek(moment().week(), moment().year(), 6);
+
+      if (date === moment().format('YYYY-MM-DD')) {
+        dayCount++;
+        setCountDay(dayCount);
+      }
+
       if (date_year === moment().year()) {
         if (date_month === moment().month()) {
           if (date_day >= moment().date()) {
-            count++;
-            setCountMonth(count);
+            monthCount++;
+            setCountMonth(monthCount);
+          }
+          if (date >= weekStart && date <= weekEnd) {
+            weekCount++;
+            setCountWeek(weekCount);
           }
         }
       }
@@ -75,7 +92,7 @@ export const Home = (props) => {
         let end = moment(date, 'YYYY-MM-DD');
         let diff = moment.duration(end.diff(start)).asDays();
 
-        if (diff > -1 && diff <= 7) {
+        if (diff > -1 && diff <= 4) {
           upcomingEvents.push(item);
         }
 
@@ -271,7 +288,7 @@ export const Home = (props) => {
             navigation.setParams({isEventSelected: false});
           }}
         >
-          <View style={{flex: 0.55, width: '100%', height: '100%'}}>
+          <View style={{flex: 1, width: '100%', height: '100%'}}>
             <View
               style={{
                 flex: 1,
@@ -322,6 +339,17 @@ export const Home = (props) => {
                   )}
                 >
                   <CalendarMonth {...props} markedDates={events} />
+                  <View
+                    style={{
+                      flex: 0.45,
+                      paddingHorizontal: '5%',
+                      width: '100%',
+                      height: '100%',
+                      paddingVertical: 15
+                    }}
+                  >
+                    {renderEventDetail()}
+                  </View>
                 </Tab>
                 <Tab
                   textStyle={{fontSize: 12, color: '#4A4A4A'}}
@@ -335,10 +363,43 @@ export const Home = (props) => {
                   heading={(
                     <TabHeading style={{backgroundColor: '#FFFFFF'}}>
                       <Text>Week</Text>
+                      <Card
+                        style={{
+                          borderRadius: 25 / 2,
+                          height: 25,
+                          width: 25,
+                          backgroundColor: '#fd5c5c',
+                          flex: 0.35,
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#FFFFFF',
+                            fontSize: 12,
+                            alignSelf: 'center',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {countWeek}
+                        </Text>
+                      </Card>
                     </TabHeading>
                   )}
                 >
                   <CalendarWeek {...props} />
+                  <View
+                    style={{
+                      flex: 0.45,
+                      paddingHorizontal: '5%',
+                      width: '100%',
+                      height: '100%',
+                      paddingVertical: 15
+                    }}
+                  >
+                    {renderEventDetail()}
+                  </View>
                 </Tab>
                 <Tab
                   textStyle={{fontSize: 12, color: '#4A4A4A'}}
@@ -352,26 +413,37 @@ export const Home = (props) => {
                   heading={(
                     <TabHeading style={{backgroundColor: '#FFFFFF'}}>
                       <Text>Day</Text>
+                      <Card
+                        style={{
+                          borderRadius: 25 / 2,
+                          height: 25,
+                          width: 25,
+                          backgroundColor: '#fd5c5c',
+                          flex: 0.35,
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#FFFFFF',
+                            fontSize: 12,
+                            alignSelf: 'center',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {countDay}
+                        </Text>
+                      </Card>
                     </TabHeading>
                   )}
                 >
-                  {/* <Applications navigation={this.props.navigation} /> */}
+                  <CalendarDay {...props} />
                 </Tab>
               </Tabs>
             </View>
           </View>
         </TouchableWithoutFeedback>
-        <View
-          style={{
-            flex: 0.45,
-            paddingHorizontal: '5%',
-            width: '100%',
-            height: '100%',
-            paddingVertical: 15
-          }}
-        >
-          {renderEventDetail()}
-        </View>
       </SafeAreaView>
     </View>
   );

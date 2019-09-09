@@ -33,6 +33,7 @@ export default class CalendarWeekItem extends Component {
               paddingVertical: '5%',
               width: '100%'
             }}
+            onPress={() => this.props.navigation.navigate('EventForm')}
           >
             <View style={{alignItems: 'center'}}>
               <Text style={{fontSize: 15, color: '#CCCCCC'}}>No Event</Text>

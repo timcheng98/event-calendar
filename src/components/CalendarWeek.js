@@ -121,42 +121,49 @@ export default class CalendarWeek extends Component {
       <View>
         <ScrollView contentContainerStyle={{flexGrow: 1}} >
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 0, 'DD')}
             day="Sun"
             item={this.state.sun}
             bgColor="#FDFDFD"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 1, 'DD')}
             day="Mon"
             item={this.state.mon}
             bgColor="#FFFFFF"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 2, 'DD')}
             day="Tue"
             item={this.state.tue}
             bgColor="#FDFDFD"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 3, 'DD')}
             day="Wed"
             item={this.state.wed}
             bgColor="#FFFFFF"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 4, 'DD')}
             day="Thu"
             item={this.state.thu}
             bgColor="#FDFDFD"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 5, 'DD')}
             day="Fri"
             item={this.state.fri}
             bgColor="#FDFDFD"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 6, 'DD')}
             day="Sat"
             item={this.state.sat}
