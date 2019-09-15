@@ -119,10 +119,10 @@ class EventEditForm extends React.Component {
     await this.setState({allDay: value});
     if (this.state.allDay) {
       this.setState({startTime: '00:00', endTime: '23:59'});
-      this.props.navigation.setParams({startTime: '00:00', endTime: '23:59'});
+      this.props.navigation.setParams({startTime: '00:00', endTime: '23:59', allDay: true});
     } else {
       this.setState({startTime: null, endTime: null});
-      this.props.navigation.setParams({startTime: null, endTime: null});
+      this.props.navigation.setParams({startTime: null, endTime: null, allDay: false});
     }
   };
 
