@@ -1,39 +1,23 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {
-  View, Modal, TouchableOpacity, FlatList, Text
+  Text, View, Modal, TouchableOpacity, FlatList
 } from 'react-native';
-import {Spinner, Icon} from 'native-base';
-import {Calendar} from 'react-native-calendars';
+import {Icon} from 'native-base';
 import moment from 'moment';
 import EventDetailComponent from './EventDetailComponent';
 import * as Main from '../core/Main';
 
-class CalendarMonth extends React.Component {
+export default class EventModal extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      markedDatesObj: {},
-      day: '',
-      loading: true
-    };
-    this.props.navigation.addListener('willFocus', async () => {
-      let markedDatesObj = await Main.getStorage('markedDatesObj');
-      this.setState({markedDatesObj, loading: false});
-    });
   }
-
-  async componentDidMount() {
-    let markedDatesObj = await Main.getStorage('markedDatesObj');
-    this.setState({markedDatesObj, loading: false});
-    this.props.navigation.setParams({visible: false});
-  }
-
+  
   renderEvent() {
     let {markedDates} = this.props;
     let selectedDay = [];
     if (markedDates !== null) {
       markedDates.map((item) => {
-        if (Main.getKey(item) === this.state.day) {
+        if (Main.getKey(item) === this.props.day) {
           selectedDay.push(item);
         }
         return item;
@@ -98,38 +82,8 @@ class CalendarMonth extends React.Component {
   }
 
   render() {
-    const {markedDatesObj, loading} = this.state;
-
-    if (loading) {
-      return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <Spinner />
-        </View>
-      );
-    }
-
     return (
-      <View
-        style={{
-          flex: 1,
-          width: '100%',
-          height: '100%',
-          alignItems: 'center'
-        }}
-      >
-        <Calendar
-          markedDates={markedDatesObj}
-          displayLoadingIndicator
-          style={{width: '100%'}}
-          hideExtraDays
-          onMonthChange={(month) => this.props.navigation.setParams({selectedMonth: month})}
-          onDayPress={async (day) => {
-            this.props.navigation.setParams({visible: true});
-            await Main.setEvents(day.dateString);
-            let dateString = await Main.getEvents();
-            this.setState({day: dateString});
-          }}
-        />
+      <View>
         <Modal
           animationType="slide"
           transparent
@@ -151,7 +105,7 @@ class CalendarMonth extends React.Component {
                 <View style={{flex: 0.25, paddingLeft: '5%'}} />
                 <View style={{flex: 0.5, justifyContent: 'center', alignItems: 'center'}}>
                   <Text style={{fontSize: 25, color: '#4A4A4A', alignSelf: 'center'}}>
-                    {this.state.day}
+                    {this.props.day}
                   </Text>
                 </View>
                 <View
@@ -183,4 +137,3 @@ class CalendarMonth extends React.Component {
     );
   }
 }
-export default CalendarMonth;

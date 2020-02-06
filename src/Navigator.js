@@ -1,8 +1,9 @@
 import {Dimensions} from 'react-native';
 import {createDrawerNavigator} from 'react-navigation-drawer';
 import {Home} from './containers/Home/Home';
-import CalendarMonth from './components/CalendarMonth';
-import CalendarWeek from './components/CalendarWeek';
+import CalendarMonth from './containers/Calendar/CalendarMonth';
+import CalendarWeek from './containers/Calendar/CalendarWeek';
+import CalendarDay from './containers/Calendar/CalendarDay';
 import {createStackNavigator} from 'react-navigation-stack';
 import EventForm from './containers/Event/EventForm';
 import EventEditForm from './containers/Event/EventEditForm';
@@ -14,7 +15,8 @@ export const HomeNavigator = createStackNavigator(
     EventForm,
     EventEditForm,
     CalendarMonth,
-    CalendarWeek
+    CalendarWeek,
+    CalendarDay
   },
   {
     initialRouteName: 'Home'

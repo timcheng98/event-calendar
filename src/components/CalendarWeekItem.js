@@ -1,6 +1,8 @@
-import React, { Component } from 'react';
-import { Text, View, ScrollView, TouchableOpacity } from 'react-native';
-import { Icon } from 'native-base';
+import React, {Component} from 'react';
+import {
+  Text, View, ScrollView, TouchableOpacity
+} from 'react-native';
+import {Icon} from 'native-base';
 
 export default class CalendarWeekItem extends Component {
   render() {
@@ -16,11 +18,30 @@ export default class CalendarWeekItem extends Component {
           flexDirection: 'row',
           paddingVertical: 10
         }}
-        // key={uuidV4()}
       >
-        <View style={{flex: 0.2, alignItems: 'center'}}>
-          <Text style={{fontSize: 15, color: '#4A4A4A'}}>{this.props.date}</Text>
-          <Text style={{fontSize: 18, color: '#4A4A4A'}}>{this.props.day}</Text>
+        <View
+          style={{
+            flex: 0.2,
+            height: '100%',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <TouchableOpacity activeOpacity={1}>
+            <View
+              style={{
+                flex: 1,
+                height: '100%',
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Text style={{fontSize: 15, color: '#4A4A4A'}}>{this.props.date}</Text>
+              <Text style={{fontSize: 18, color: '#4A4A4A'}}>{this.props.day}</Text>
+            </View>
+          </TouchableOpacity>
         </View>
         {this.props.item.length > 0 ? (
           <View style={{flex: 0.8}}>{this.props.item}</View>
@@ -33,6 +54,7 @@ export default class CalendarWeekItem extends Component {
               paddingVertical: '5%',
               width: '100%'
             }}
+            onPress={() => this.props.navigation.navigate('EventForm')}
           >
             <View style={{alignItems: 'center'}}>
               <Text style={{fontSize: 15, color: '#CCCCCC'}}>No Event</Text>
@@ -45,6 +67,6 @@ export default class CalendarWeekItem extends Component {
           </TouchableOpacity>
         )}
       </ScrollView>
-    )
+    );
   }
 }

@@ -4,11 +4,11 @@ import {
 } from 'react-native';
 import {Icon} from 'native-base';
 import moment from 'moment';
-import EventDetailComponent from './EventDetailComponent';
-import EventPreviewTemplate from './EventPreviewTemplate';
-import CalendarWeekItem from './CalendarWeekItem';
+import EventDetailComponent from '../../components/EventDetailComponent';
+import EventPreviewTemplate from '../../components/EventPreviewTemplate';
+import CalendarWeekItem from '../../components/CalendarWeekItem';
 import uuidV4 from 'uuid/v4';
-import * as Main from '../core/Main';
+import * as Main from '../../core/Main';
 
 export default class CalendarWeek extends Component {
   constructor(props) {
@@ -118,49 +118,56 @@ export default class CalendarWeek extends Component {
     let year = moment().year();
 
     return (
-      <View>
+      <View style={{flex: 0.55}}>
         <ScrollView contentContainerStyle={{flexGrow: 1}} >
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 0, 'DD')}
             day="Sun"
             item={this.state.sun}
             bgColor="#FDFDFD"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 1, 'DD')}
             day="Mon"
             item={this.state.mon}
             bgColor="#FFFFFF"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 2, 'DD')}
             day="Tue"
             item={this.state.tue}
             bgColor="#FDFDFD"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 3, 'DD')}
             day="Wed"
             item={this.state.wed}
             bgColor="#FFFFFF"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 4, 'DD')}
             day="Thu"
             item={this.state.thu}
             bgColor="#FDFDFD"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 5, 'DD')}
             day="Fri"
             item={this.state.fri}
-            bgColor="#FDFDFD"
+            bgColor="#FFFFFF"
           />
           <CalendarWeekItem
+            {...this.props}
             date={Main.getDateFromWeek(week, year, 6, 'DD')}
             day="Sat"
             item={this.state.sat}
-            bgColor="#FFFFFF"
+            bgColor="#FDFDFD"
           />
         </ScrollView>
         <Modal
@@ -184,7 +191,7 @@ export default class CalendarWeek extends Component {
                 <View style={{flex: 0.25, paddingLeft: '5%'}} />
                 <View style={{flex: 0.5, justifyContent: 'center', alignItems: 'center'}}>
                   <Text style={{fontSize: 25, color: '#4A4A4A', alignSelf: 'center'}}>
-                    {this.state.day}
+                    {this.props.navigation.getParam('date')}
                   </Text>
                 </View>
                 <View

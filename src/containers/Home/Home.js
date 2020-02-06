@@ -5,14 +5,21 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Modal,
+  ScrollView,
   TouchableWithoutFeedback
 } from 'react-native';
 import {
-  Card, Icon, Tab, Tabs, TabHeading, Spinner
+  Icon, Tab, Tabs, TabHeading, Spinner
 } from 'native-base';
+import {
+  Badge
+} from 'react-native-elements';
 import moment from 'moment';
-import CalendarMonth from '../../components/CalendarMonth';
-import CalendarWeek from '../../components/CalendarWeek';
+import _ from 'lodash';
+import CalendarMonth from '../Calendar/CalendarMonth';
+import CalendarWeek from '../Calendar/CalendarWeek';
+import CalendarDay from '../Calendar/CalendarDay';
 import EventDetailComponent from '../../components/EventDetailComponent';
 import Header from '../../components/Header';
 import * as Main from '../../core/Main';
@@ -21,6 +28,9 @@ export const Home = (props) => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState({});
   const [countMonth, setCountMonth] = useState(0);
+  const [countWeek, setCountWeek] = useState(0);
+  const [countDay, setCountDay] = useState(0);
+  const [day, setDay] = useState('');
   const [loading, setLoading] = useState(true);
 
   const {navigation} = props;
@@ -28,41 +38,137 @@ export const Home = (props) => {
   useEffect(() => {
     setLoading(false);
     navigationWillFocus();
+    navigation.setParams({isEventSelected: false, visible: false, selectedEvent: {}});
   }, []);
 
   const navigationWillFocus = () => {
     navigation.addListener('willFocus', () => {
       getEvents();
       getMonthlyEvents();
-      navigation.setParams({isEventSelected: false, visible: false});
+      navigation.setParams({isEventSelected: false, visible: false, selectedEvent: {}});
     });
   };
 
   const getEvents = async () => {
     let markedDates = await Main.getStorage('markedDates');
     setEvents(markedDates);
-    console.log('markedDates', markedDates);
+    // console.log('markedDates', markedDates);
   };
 
   const getMonthlyEvents = async () => {
     let markedDates = await Main.getStorage('markedDates');
-    let count = 0;
+    let monthCount = 0;
+    let weekCount = 0;
+    let dayCount = 0;
     markedDates.map((item) => {
       let date = Main.getKey(item);
       let date_year = moment(date).year();
       let date_month = moment(date).month();
       let date_day = moment(date).date();
 
+      let today = moment().format('YYYY-MM-DD');
+      let weekEnd = Main.getDateFromWeek(moment().week(), moment().year(), 6);
+
+      if (date === moment().format('YYYY-MM-DD')) {
+        dayCount++;
+        setCountDay(dayCount);
+      }
+
       if (date_year === moment().year()) {
         if (date_month === moment().month()) {
           if (date_day >= moment().date()) {
-            count++;
-            setCountMonth(count);
+            monthCount++;
+            setCountMonth(monthCount);
+          }
+          if (date >= today && date <= weekEnd) {
+            weekCount++;
+            setCountWeek(weekCount);
           }
         }
       }
       return item;
     });
+  };
+
+
+  const showEvent = () => {
+    return (
+      <View style={{flex: 1}}>
+        <EventDetailComponent
+          eventData={selectedEvent}
+          singleDay
+          weekMode
+          {...props}
+        />
+        <View style={{flex: 0.2}} />
+      </View>
+    );
+  }
+
+  const displayUpcoming = (item, events) => {
+    let renderItem = [];
+    events.map((event) => {
+      if (item === event.date) {
+        let {
+          title, startTime, endTime, id, allDay, remark, date
+        } = event;
+        renderItem.push(
+          <ScrollView key={event.id} contentContainerStyle={{flexGrow: 2}}>
+            <TouchableOpacity
+              onPress={() => {
+                let eventObj = {
+                  title,
+                  startTime,
+                  endTime,
+                  date,
+                  remark,
+                  id,
+                  allDay
+                };
+                console.log(eventObj);
+                setDay(date);
+                setSelectedEvent(eventObj);
+                props.navigation.setParams({visible: true});
+              }}
+            >
+              <View style={{flex: 1, flexDirection: 'row', backgroundColor: ''}}>
+                <View
+                  style={{
+                    flex: 0.3,
+                    backgroundColor: '',
+                    borderRightWidth: 1,
+                    marginVertical: '3%',
+                    borderColor: '#4A4A4A'
+                  }}
+                >
+                  {event.allDay ? (
+                    <Text style={{fontSize: 12, alignSelf: 'center'}}>All Day</Text>
+                  ) : (
+                    <Text style={{fontSize: 12, alignSelf: 'center'}}>{`${event.startTime} - ${event.endTime}`}</Text>
+                  )}
+                </View>
+                <View
+                  style={{
+                    flex: 0.7,
+                    paddingLeft: '5%',
+                    backgroundColor: '',
+                    marginVertical: '3%'
+                  }}
+                >
+                  <Text>
+                    {event.title}
+                    {' '}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </ScrollView>,
+        );
+      }
+    });
+    // console.log('item', item);
+    // console.log('events', events);
+    return renderItem;
   };
 
   const renderEvent = () => {
@@ -78,115 +184,53 @@ export const Home = (props) => {
         if (diff > -1 && diff <= 7) {
           upcomingEvents.push(item);
         }
-
         return upcomingEvents;
       });
-
-      let sortedUpcomingEvents = upcomingEvents.sort((a, b) => {
-        let first = moment(Main.getKey(a)).unix();
-        let second = moment(Main.getKey(b)).unix();
-        return first - second;
+      
+      let eventArr = [];
+      upcomingEvents.map((item) => {
+        let date = Main.getKey(item);
+        Object.assign(Main.getValue(item), {date});
+        eventArr.push(Main.getValue(item));
+        return item;
       });
 
-      if (sortedUpcomingEvents.length > 0) {
-        return (
-          <FlatList
-            style={{flex: 1}}
-            keyExtractor={(item, index) => index.toString()}
-            data={sortedUpcomingEvents}
-            renderItem={(item) => {
-              let event = Main.getValue(item.item);
-              let date = Main.getKey(item.item);
-              let {
-                id, title, startTime, endTime, remark, allDay
-              } = event;
-              date = moment(date).format('MMMM DD, YYYY');
-              let eventObj = {
-                id,
-                date,
-                title,
-                startTime,
-                endTime,
-                remark,
-                allDay
-              };
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    props.navigation.setParams({isEventSelected: true});
-                    setSelectedEvent(eventObj);
-                  }}
-                >
-                  <View
-                    style={{
-                      flex: 0.2,
-                      paddingVertical: '3%',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      width: '100%',
-                      borderBottomWidth: 1 / 3,
-                      borderColor: '#CCCCCC'
-                    }}
-                  >
-                    <View style={{flex: 0.1}}>
-                      <Icon
-                        style={{
-                          fontSize: 25,
-                          color: '#4A4A4A',
-                          marginRight: 10
-                        }}
-                        type="MaterialCommunityIcons"
-                        name="circle-medium"
-                      />
-                    </View>
-                    <View style={{flex: 0.55}}>
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          color: '#2E2E2E',
-                          fontWeight: 'bold',
-                          paddingBottom: '2%'
-                        }}
-                      >
-                        {title}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          color: '#6A6A6A'
-                        }}
-                      >
-                        {date}
-                      </Text>
-                    </View>
-                    <View style={{flex: 0.3}}>
-                      <Text
-                        style={{
-                          color: '#4A4A4A',
-                          fontSize: 15
-                        }}
-                      >
-                        {allDay ? 'Whole Day' : `${startTime} - ${endTime}`}
-                      </Text>
-                    </View>
-                    <View style={{flex: 0.15}}>
-                      <Icon
-                        style={{
-                          fontSize: 35,
-                          color: '#2E2E2E',
-                          paddingLeft: 10
-                        }}
-                        type="MaterialCommunityIcons"
-                        name="arrow-right-box"
-                      />
-                    </View>
+      let sortedEvent = [];
+      sortedEvent = _.orderBy(eventArr, ['date', 'startTime', 'allDay'], ['asc', 'asc', 'asc']);
+
+      if (eventArr.length > 0) {
+        let dates = [];
+
+        eventArr.map((item) => {
+          dates.push(item.date);
+          return item;
+        });
+
+        dates = [...new Set(dates)];
+
+        return dates.map((item) => (
+          <View style={{flex: 1}} key={item}>
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
+              <TouchableOpacity activeOpacity={1}>
+                <View>
+                  <View style={{width: '100%', paddingVertical: '1%', backgroundColor: '#008CBF'}}>
+                    <Text
+                      style={{
+                        color: '#FFFFFF',
+                        paddingLeft: '2%',
+                        fontWeight: '500',
+                        fontSize: 14
+                      }}
+                    >
+                      {moment(item).format('DD/MM ddd')}
+                    </Text>
                   </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        );
+                  {displayUpcoming(item, sortedEvent)}
+                </View>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        ));
       }
 
       return (
@@ -202,9 +246,7 @@ export const Home = (props) => {
           </View>
           <View style={{alignItems: 'center'}}>
             <Text style={{color: '#CCCCCC', fontSize: 15}}>Click “+” button to create event</Text>
-            <TouchableOpacity
-              onPress={() => props.navigation.navigate('EventForm')}
-            >
+            <TouchableOpacity onPress={() => props.navigation.navigate('EventForm')}>
               <Icon
                 style={{fontSize: 20, color: '#008CBF', padding: 10}}
                 type="MaterialIcons"
@@ -222,34 +264,13 @@ export const Home = (props) => {
       return <EventDetailComponent {...props} eventData={selectedEvent} />;
     }
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'flex-start',
-          width: '100%'
-        }}
-      >
-        <View style={{flex: 0.15, width: '100%'}}>
+      <View>
+        <View style={{flexGrow: 0.15, width: '100%', height: 30}}>
           <Text style={{fontSize: 18, color: '#BFBFBF', fontWeight: '500'}}>Upcoming Events</Text>
         </View>
-        <Card
-          style={{
-            flex: 1,
-            width: '100%',
-            shadowColor: '#4A4A4A',
-            shadowOffset: {
-              width: 0,
-              height: 2
-            },
-            shadowOpacity: 0.3,
-            shadowRadius: 3.84,
-            borderRadius: 5,
-            elevation: 5,
-            paddingHorizontal: '5%'
-          }}
-        >
+        <ScrollView contentContainerStyle={{flexGrow: 1, width: '100%'}}>
           <View style={{flex: 1, width: '100%'}}>{renderEvent()}</View>
-        </Card>
+        </ScrollView>
       </View>
     );
   };
@@ -271,7 +292,7 @@ export const Home = (props) => {
             navigation.setParams({isEventSelected: false});
           }}
         >
-          <View style={{flex: 0.55, width: '100%', height: '100%'}}>
+          <View style={{flex: 1, width: '100%', height: '100%'}}>
             <View
               style={{
                 flex: 1,
@@ -296,32 +317,22 @@ export const Home = (props) => {
                   heading={(
                     <TabHeading style={{backgroundColor: '#FFFFFF'}}>
                       <Text>Month</Text>
-                      <Card
-                        style={{
-                          borderRadius: 25 / 2,
-                          height: 25,
-                          width: 25,
-                          backgroundColor: '#fd5c5c',
-                          flex: 0.35,
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: '#FFFFFF',
-                            fontSize: 12,
-                            alignSelf: 'center',
-                            fontWeight: '500'
-                          }}
-                        >
-                          {countMonth}
-                        </Text>
-                      </Card>
+                      <Badge value={countMonth} status="error" />
                     </TabHeading>
-                  )}
+)}
                 >
                   <CalendarMonth {...props} markedDates={events} />
+                  <View
+                    style={{
+                      flex: 0.45,
+                      paddingHorizontal: '5%',
+                      width: '100%',
+                      height: '100%',
+                      paddingVertical: '2%'
+                    }}
+                  >
+                    {renderEventDetail()}
+                  </View>
                 </Tab>
                 <Tab
                   textStyle={{fontSize: 12, color: '#4A4A4A'}}
@@ -335,10 +346,22 @@ export const Home = (props) => {
                   heading={(
                     <TabHeading style={{backgroundColor: '#FFFFFF'}}>
                       <Text>Week</Text>
+                      <Badge value={countWeek} status="error" />
                     </TabHeading>
                   )}
                 >
                   <CalendarWeek {...props} />
+                  <View
+                    style={{
+                      flex: 0.45,
+                      paddingHorizontal: '5%',
+                      width: '100%',
+                      height: '100%',
+                      paddingVertical: 15
+                    }}
+                  >
+                    {renderEventDetail()}
+                  </View>
                 </Tab>
                 <Tab
                   textStyle={{fontSize: 12, color: '#4A4A4A'}}
@@ -352,26 +375,66 @@ export const Home = (props) => {
                   heading={(
                     <TabHeading style={{backgroundColor: '#FFFFFF'}}>
                       <Text>Day</Text>
+                      <Badge value={countDay} status="error" />
                     </TabHeading>
-                  )}
+)}
                 >
-                  {/* <Applications navigation={this.props.navigation} /> */}
+                  <CalendarDay {...props} />
                 </Tab>
               </Tabs>
             </View>
           </View>
         </TouchableWithoutFeedback>
-        <View
-          style={{
-            flex: 0.45,
-            paddingHorizontal: '5%',
-            width: '100%',
-            height: '100%',
-            paddingVertical: 15
-          }}
+
+        <Modal
+          animationType="slide"
+          transparent
+          visible={props.navigation.getParam('visible')}
         >
-          {renderEventDetail()}
-        </View>
+          {/* <TouchableWithoutFeedback
+            onPress={() => this.props.navigation.setParams({visible: false})}
+          > */}
+          <View style={{flex: 1, backgroundColor: '#FFFFFFE7'}}>
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <View
+                style={{
+                  flex: 0.2,
+                  alignItems: 'flex-end',
+                  paddingBottom: 5,
+                  flexDirection: 'row'
+                }}
+              >
+                <View style={{flex: 0.25, paddingLeft: '5%'}} />
+                <View style={{flex: 0.5, justifyContent: 'center', alignItems: 'center'}}>
+                  <Text style={{fontSize: 25, color: '#4A4A4A', alignSelf: 'center'}}>
+                    {day}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flex: 0.25,
+                    justifyContent: 'flex-end',
+                    alignItems: 'flex-end',
+                    paddingRight: '5%'
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => props.navigation.setParams({visible: false})}
+                  >
+                    <Icon
+                      type="MaterialIcons"
+                      name="clear"
+                      style={{fontSize: 28, color: '#4A4A4A', width: '100%'}}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{flex: 0.6, width: '100%'}}>{showEvent()}</View>
+              <View style={{flex: 0.2}} />
+            </View>
+          </View>
+          {/* </TouchableWithoutFeedback> */}
+        </Modal>
       </SafeAreaView>
     </View>
   );
@@ -388,15 +451,9 @@ Home.navigationOptions = ({navigation}) => ({
   headerForceInset: {top: 'never', bottom: 'never'},
   headerLeft: (
     <View style={{flex: 1, flexDirection: 'row'}}>
-      <Header
-        action={() => navigation.openDrawer()}
-        type="MaterialIcons"
-        iconName="sort"
-      />
+      <Header action={() => navigation.openDrawer()} type="MaterialIcons" iconName="sort" />
       <View style={{alignSelf: 'center'}}>
-        <Text style={{fontSize: 15, fontWeight: '400'}}>
-          {moment().format('DD MMMM, YYYY')}
-        </Text>
+        <Text style={{fontSize: 15, fontWeight: '400'}}>{moment().format('DD MMMM, YYYY')}</Text>
       </View>
     </View>
   ),
